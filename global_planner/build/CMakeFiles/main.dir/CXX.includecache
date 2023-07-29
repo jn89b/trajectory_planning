@@ -7,6 +7,18 @@
 #IncludeRegexTransform: 
 
 ../include/Astar.h
+stdio.h
+-
+queue
+-
+vector
+-
+set
+-
+PositionVector.h
+../include/PositionVector.h
+GridMap.h
+../include/GridMap.h
 doctest/doctest.h
 ../include/doctest/doctest.h
 
@@ -23,18 +35,24 @@ doctest/doctest.h
 ../include/doctest/doctest.h
 
 ../include/PositionVector.h
+math.h
+-
+iostream
+-
+stdio.h
+-
+vector
+-
 
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp
 iostream
+-
+unordered_set
 -
 Astar.h
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/Astar.h
 GridMap.h
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/GridMap.h
-
-/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.cpp
-GridMap.h
-/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.h
-math.h
--
+PositionVector.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/PositionVector.h
 

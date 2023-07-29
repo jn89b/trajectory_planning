@@ -8,6 +8,8 @@ CMakeFiles/main.dir/main.cpp.o
  /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp
 CMakeFiles/main.dir/src/Astar.cpp.o
  ../include/Astar.h
+ ../include/GridMap.h
+ ../include/PositionVector.h
  /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/Astar.cpp
 CMakeFiles/main.dir/src/GridMap.cpp.o
  ../include/GridMap.h

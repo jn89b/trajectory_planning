@@ -7,6 +7,8 @@ CMakeFiles/main.dir/main.cpp.o: ../include/PositionVector.h
 CMakeFiles/main.dir/main.cpp.o: ../main.cpp
 
 CMakeFiles/main.dir/src/Astar.cpp.o: ../include/Astar.h
+CMakeFiles/main.dir/src/Astar.cpp.o: ../include/GridMap.h
+CMakeFiles/main.dir/src/Astar.cpp.o: ../include/PositionVector.h
 CMakeFiles/main.dir/src/Astar.cpp.o: ../src/Astar.cpp
 
 CMakeFiles/main.dir/src/GridMap.cpp.o: ../include/GridMap.h

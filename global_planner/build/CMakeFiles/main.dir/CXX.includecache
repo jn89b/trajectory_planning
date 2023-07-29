@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/Astar.h
+doctest/doctest.h
+../include/doctest/doctest.h
+
+../include/GridMap.h
+iostream
+-
+stdio.h
+-
+vector
+-
+PositionVector.h
+-
+doctest/doctest.h
+../include/doctest/doctest.h
+
+../include/PositionVector.h
+
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp
+iostream
+-
+Astar.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/Astar.h
+GridMap.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/GridMap.h
+
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.cpp
+GridMap.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.h
+math.h
+-
+

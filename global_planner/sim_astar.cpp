@@ -5,11 +5,11 @@
 #include "Astar.h"
 #include "GridMap.h"
 #include "PositionVector.h"
-
+#include <matplot/matplot.h>
 
 // #include "matplotlibcpp.h"
 // namespace plt = matplotlibcpp;
-
+using namespace matplot;
 int main()
 {
     printf("Astar finding path\n");
@@ -17,18 +17,18 @@ int main()
     // testing agent get moves 
     Agent agent1(2,0,0,10,10,10);
     GridMap gridmap;
-    gridmap.setGridSize(0, 0, 0, 30, 30, 10);
+    gridmap.setGridSize(0, 0, 0, 1000, 1000, 10);
 
     //insert obstacle 
-    Obstacle obstacle(5, 5, 1, 1, 1);
+    Obstacle obstacle(500, 500, 1, 50.0f, 1);
     int num_obs = gridmap.insertObstacle(obstacle);
 
     // Construct astar object with gridmap and agent 
     Astar astar(gridmap, agent1);
 
     // astar imlementation
-    agent1.setPosition(3, 5, 3);
-    agent1.setGoalPosition(15, 15, 6);
+    agent1.setPosition(0, 0, 3);
+    agent1.setGoalPosition(650, 650, 10);
     std::vector<PositionVector> path = astar.searchPath();
     
     std::vector<int> x_pos;
@@ -42,6 +42,9 @@ int main()
         z_pos.push_back(path[i].z);
     }
 
+    plot3(x_pos, y_pos, z_pos, "-o");
+    // plot(x_pos, y_pos, "-o");
+    show();
     // plt::plot(x_pos, y_pos, "-o");
     // plt::xlabel("x");
     // plt::ylabel("y");

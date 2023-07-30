@@ -39,7 +39,7 @@ std::vector<PositionVector> Astar::searchPath()
     initializeNodes();
 
     // need to have this as a parameter 
-    int max_iter = 50000;
+    int max_iter = 1E8;
     int iter = 0;   
 
     // Loop until the open set is empty
@@ -78,7 +78,7 @@ std::vector<PositionVector> Astar::searchPath()
             Node* neigh_node = new Node;
             neigh_node->pos = neigh_pos;
             neigh_node->parent = current_node->pos;
-            neigh_node->g = current_node->g + 1;
+            neigh_node->g = current_node->g + 1;//computeHeuristic(current_node->pos, neigh_node->pos);
             neigh_node->h = computeHeuristic(current_node->pos, 
                 agent_->getGoalPosition());
             neigh_node->f = neigh_node->g + neigh_node->h; 
@@ -194,9 +194,26 @@ bool Astar::isValidPosition(const PositionVector& pos)
 float Astar::computeHeuristic(const PositionVector& from_pos, 
     const PositionVector& to_pos)
 {   
-    return sqrt(pow(from_pos.x - to_pos.x, 2) + 
+    
+    float elevation_penalty = 1;
+    float distance_penalty = 1;
+    
+
+    float distance_from_goal = sqrt(pow(from_pos.x - to_pos.x, 2) + 
         pow(from_pos.y - to_pos.y, 2) + 
         pow(from_pos.z - to_pos.z, 2));
+
+    if (distance_from_goal > 50)
+    {
+        distance_penalty = 1.5;
+
+        if (from_pos.z != to_pos.z)
+            elevation_penalty = 1.5;
+    }
+
+    return sqrt(pow(from_pos.x - to_pos.x, 2) + 
+        pow(from_pos.y - to_pos.y, 2) + 
+        pow(from_pos.z - to_pos.z, 2)) * elevation_penalty * distance_penalty;
 
 
 }

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <unordered_set>
 
-
 #include "Astar.h"
 #include "GridMap.h"
 #include "PositionVector.h"
@@ -37,7 +36,7 @@ int main()
     gridmap.getGridSizeY(), 
     gridmap.getGridSizeZ());
 
-    gridmap.setGridSize(0, 0, 0, 20, 20, 20);
+    gridmap.setGridSize(0, 0, 0, 30, 30, 10);
 
     printf("grid sizes of x y z %d %d %d\n", 
     gridmap.getGridSizeX(), 
@@ -45,7 +44,7 @@ int main()
     gridmap.getGridSizeZ());
 
     //insert obstacle 
-    Obstacle obstacle(1, 1, 1, 1, 1);
+    Obstacle obstacle(5, 5, 1, 1, 1);
     int num_obs = gridmap.insertObstacle(obstacle);
     printf("Number of obstacles: %d\n", num_obs);
     
@@ -132,11 +131,8 @@ int main()
 
     // // test astar isvalid
     agent1.setPosition(3, 5, 3);
-    // moves = agent1.getMoves3D(agent1.getPosition());
-    
-    moves = astar.getLegalNeighbors(agent1.getPosition());
-
-
+    agent1.setGoalPosition(20, 30, 20);
+    std::vector<PositionVector> neighbors = astar.searchPath();
 
     return 0;
 }

@@ -11,13 +11,13 @@
 class Agent 
 {
     private:
-        double x;
-        double y;
-        double z;
+        int x;
+        int y;
+        int z;
         
-        double goal_x;
-        double goal_y;
-        double goal_z;
+        int goal_x;
+        int goal_y;
+        int goal_z;
 
         double agent_radius = 0.0f; // default value
         PositionVector position = PositionVector(
@@ -40,8 +40,8 @@ class Agent
             }
         
         // Constructor if you want set as individual doubles
-        Agent(double x, double y, double z, 
-            double goal_x, double goal_y, double goal_z, 
+        Agent(int x, int y, int z, 
+            int goal_x, int goal_y, int goal_z, 
             double agent_radius=0.0f);
         
         double getX() {return x;}
@@ -64,10 +64,12 @@ class Agent
         //setter getters and update for goal position
         void setGoalPosition(PositionVector goal_pos) 
             {goal_position = goal_pos;}
+        void setGoalPosition(int x, int y, int z) 
+            {goal_position = PositionVector(x, y, z);}
         PositionVector getGoalPosition() {return goal_position;}
         void updateGoalPosition(PositionVector new_pos) 
             {goal_position = new_pos;}
-        void updateGoalPosition(double x, double y, double z)
+        void updateGoalPosition(int x, int y, int z)
             {goal_position = PositionVector(x, y, z);}
 
 
@@ -92,13 +94,13 @@ class Obstacle
     //--------------PUBLIC ----------/
     public:        
         // Constructor
-        Obstacle(double x, double y, double z, double radius, double height);        
+        Obstacle(int x, int y, int z, double radius, int height);        
         
-        double getX() {return x;}
-        double getY() {return y;}
-        double getZ() {return z;}
-        double getRadius() {return radius;}
-        double getHeight() {return height;} 
+        int getX() {return x;}
+        int getY() {return y;}
+        int getZ() {return z;}
+        int getRadius() {return radius;}
+        int getHeight() {return height;} 
         bool isInside2D(PositionVector position, double robot_radius=0.0f);
         bool isInside3D(PositionVector position, double robot_radius=0.0f);
 

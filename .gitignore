@@ -1,0 +1,7 @@
+#ignore build directory
+build/
+CMakeFiles/
+.vscode/
+global_planner/build/
+global_planner/CMakeFiles/
+global_planner/_deps/

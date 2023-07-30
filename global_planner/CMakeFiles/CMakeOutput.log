@@ -1862,3 +1862,145 @@ Parsed CXX implicit link information from above output:
   implicit fwks: []
 
 
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_adeaa/fast && /usr/bin/make -f CMakeFiles/cmTC_adeaa.dir/build.make CMakeFiles/cmTC_adeaa.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_adeaa.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_adeaa.dir/CheckIncludeFile.c.o   -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_adeaa
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_adeaa.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_adeaa.dir/CheckIncludeFile.c.o  -o cmTC_adeaa 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function pthread_create exists in the pthread passed with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_eeb5d/fast && /usr/bin/make -f CMakeFiles/cmTC_eeb5d.dir/build.make CMakeFiles/cmTC_eeb5d.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_eeb5d.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_eeb5d.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_eeb5d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eeb5d.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_eeb5d.dir/CheckFunctionExists.c.o  -o cmTC_eeb5d  -lpthread 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function sgemm_ exists passed with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_bba4e/fast && /usr/bin/make -f CMakeFiles/cmTC_bba4e.dir/build.make CMakeFiles/cmTC_bba4e.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bba4e.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgemm_   -o CMakeFiles/cmTC_bba4e.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_bba4e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bba4e.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sgemm_    CMakeFiles/cmTC_bba4e.dir/CheckFunctionExists.c.o  -o cmTC_bba4e  /usr/lib/x86_64-linux-gnu/libblas.so 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function cheev_ exists passed with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_e1f65/fast && /usr/bin/make -f CMakeFiles/cmTC_e1f65.dir/build.make CMakeFiles/cmTC_e1f65.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e1f65.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=cheev_   -o CMakeFiles/cmTC_e1f65.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e1f65
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e1f65.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=cheev_    CMakeFiles/cmTC_e1f65.dir/CheckFunctionExists.c.o  -o cmTC_e1f65  /usr/lib/x86_64-linux-gnu/liblapack.so /usr/lib/x86_64-linux-gnu/libblas.so 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+
+Performing C++ SOURCE FILE Test COMPILER_HAS_HIDDEN_VISIBILITY succeeded with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_72617/fast && /usr/bin/make -f CMakeFiles/cmTC_72617.dir/build.make CMakeFiles/cmTC_72617.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_72617.dir/src.cxx.o
+/usr/bin/c++    -DCOMPILER_HAS_HIDDEN_VISIBILITY   -fvisibility=hidden -o CMakeFiles/cmTC_72617.dir/src.cxx.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_72617
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72617.dir/link.txt --verbose=1
+/usr/bin/c++   -DCOMPILER_HAS_HIDDEN_VISIBILITY    CMakeFiles/cmTC_72617.dir/src.cxx.o  -o cmTC_72617 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY succeeded with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_6f5a8/fast && /usr/bin/make -f CMakeFiles/cmTC_6f5a8.dir/build.make CMakeFiles/cmTC_6f5a8.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6f5a8.dir/src.cxx.o
+/usr/bin/c++    -DCOMPILER_HAS_HIDDEN_INLINE_VISIBILITY   -fvisibility-inlines-hidden -o CMakeFiles/cmTC_6f5a8.dir/src.cxx.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_6f5a8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6f5a8.dir/link.txt --verbose=1
+/usr/bin/c++   -DCOMPILER_HAS_HIDDEN_INLINE_VISIBILITY    CMakeFiles/cmTC_6f5a8.dir/src.cxx.o  -o cmTC_6f5a8 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_HAS_DEPRECATED_ATTR succeeded with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_3dce6/fast && /usr/bin/make -f CMakeFiles/cmTC_3dce6.dir/build.make CMakeFiles/cmTC_3dce6.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_3dce6.dir/src.cxx.o
+/usr/bin/c++    -DCOMPILER_HAS_DEPRECATED_ATTR   -o CMakeFiles/cmTC_3dce6.dir/src.cxx.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx: In function ‘int main()’:
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx:2:34: warning: ‘int somefunc()’ is deprecated [-Wdeprecated-declarations]
+    2 |     int main() { return somefunc();}
+      |                                  ^
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx:1:37: note: declared here
+    1 | __attribute__((__deprecated__)) int somefunc() { return 0; }
+      |                                     ^~~~~~~~
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx:2:34: warning: ‘int somefunc()’ is deprecated [-Wdeprecated-declarations]
+    2 |     int main() { return somefunc();}
+      |                                  ^
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/src.cxx:1:37: note: declared here
+    1 | __attribute__((__deprecated__)) int somefunc() { return 0; }
+      |                                     ^~~~~~~~
+Linking CXX executable cmTC_3dce6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3dce6.dir/link.txt --verbose=1
+/usr/bin/c++   -DCOMPILER_HAS_DEPRECATED_ATTR    CMakeFiles/cmTC_3dce6.dir/src.cxx.o  -o cmTC_3dce6 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+__attribute__((__deprecated__)) int somefunc() { return 0; }
+    int main() { return somefunc();}
+Determining if the __fbufsize exist passed with the following output:
+Change Dir: /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ea46f/fast && /usr/bin/make -f CMakeFiles/cmTC_ea46f.dir/build.make CMakeFiles/cmTC_ea46f.dir/build
+make[1]: Entering directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ea46f.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_ea46f.dir/CheckSymbolExists.c.o   -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_ea46f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ea46f.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_ea46f.dir/CheckSymbolExists.c.o  -o cmTC_ea46f 
+make[1]: Leaving directory '/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp'
+
+
+File /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdio_ext.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef __fbufsize
+  return ((int*)(&__fbufsize))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}

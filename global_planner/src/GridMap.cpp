@@ -6,8 +6,8 @@
     Agent CLASS
     -------------------------------------------------
 */
-Agent::Agent(double x, double y, double z, 
-            double goal_x, double goal_y, double goal_z, 
+Agent::Agent(int x, int y, int z, 
+            int goal_x, int goal_y, int goal_z, 
             double agent_radius)
 {
     this->x = x;
@@ -87,7 +87,7 @@ std::vector<PositionVector> Agent::getMoves2D(PositionVector current_pos)
 */
 
 // -------------------------------------------------
-Obstacle::Obstacle(double x, double y, double z, double radius, double height)        
+Obstacle::Obstacle(int x, int y, int z, double radius, int height)        
 {
     this->x = x;
     this->y = y;

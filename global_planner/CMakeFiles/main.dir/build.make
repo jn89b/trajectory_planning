@@ -96,25 +96,25 @@ CMakeFiles/main.dir/src/PositionVector.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/PositionVector.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/PositionVector.cpp -o CMakeFiles/main.dir/src/PositionVector.cpp.s
 
-CMakeFiles/main.dir/main.cpp.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/main.cpp.o: main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/main.cpp.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp
+CMakeFiles/main.dir/sim_astar.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/sim_astar.cpp.o: sim_astar.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/sim_astar.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/sim_astar.cpp.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/sim_astar.cpp
 
-CMakeFiles/main.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp > CMakeFiles/main.dir/main.cpp.i
+CMakeFiles/main.dir/sim_astar.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/sim_astar.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/sim_astar.cpp > CMakeFiles/main.dir/sim_astar.cpp.i
 
-CMakeFiles/main.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp -o CMakeFiles/main.dir/main.cpp.s
+CMakeFiles/main.dir/sim_astar.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/sim_astar.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/sim_astar.cpp -o CMakeFiles/main.dir/sim_astar.cpp.s
 
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/src/Astar.cpp.o" \
 "CMakeFiles/main.dir/src/GridMap.cpp.o" \
 "CMakeFiles/main.dir/src/PositionVector.cpp.o" \
-"CMakeFiles/main.dir/main.cpp.o"
+"CMakeFiles/main.dir/sim_astar.cpp.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
@@ -122,8 +122,18 @@ main_EXTERNAL_OBJECTS =
 main: CMakeFiles/main.dir/src/Astar.cpp.o
 main: CMakeFiles/main.dir/src/GridMap.cpp.o
 main: CMakeFiles/main.dir/src/PositionVector.cpp.o
-main: CMakeFiles/main.dir/main.cpp.o
+main: CMakeFiles/main.dir/sim_astar.cpp.o
 main: CMakeFiles/main.dir/build.make
+main: _deps/matplotplusplus-build/source/matplot/libmatplot.a
+main: /usr/lib/x86_64-linux-gnu/libjpeg.so
+main: /usr/lib/x86_64-linux-gnu/libtiff.so
+main: /usr/lib/x86_64-linux-gnu/libz.so
+main: /usr/lib/x86_64-linux-gnu/libpng.so
+main: /usr/lib/x86_64-linux-gnu/libz.so
+main: /usr/lib/x86_64-linux-gnu/libpng.so
+main: /usr/lib/x86_64-linux-gnu/liblapack.so
+main: /usr/lib/x86_64-linux-gnu/libblas.so
+main: _deps/matplotplusplus-build/source/3rd_party/libnodesoup.a
 main: CMakeFiles/main.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)

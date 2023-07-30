@@ -70,9 +70,35 @@ CMakeFiles/main.dir/src/Astar.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/Astar.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/Astar.cpp -o CMakeFiles/main.dir/src/Astar.cpp.s
 
+CMakeFiles/main.dir/src/GridMap.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/GridMap.cpp.o: src/GridMap.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/GridMap.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/GridMap.cpp.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.cpp
+
+CMakeFiles/main.dir/src/GridMap.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/GridMap.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.cpp > CMakeFiles/main.dir/src/GridMap.cpp.i
+
+CMakeFiles/main.dir/src/GridMap.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/GridMap.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.cpp -o CMakeFiles/main.dir/src/GridMap.cpp.s
+
+CMakeFiles/main.dir/src/PositionVector.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/PositionVector.cpp.o: src/PositionVector.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/PositionVector.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/PositionVector.cpp.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/PositionVector.cpp
+
+CMakeFiles/main.dir/src/PositionVector.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/PositionVector.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/PositionVector.cpp > CMakeFiles/main.dir/src/PositionVector.cpp.i
+
+CMakeFiles/main.dir/src/PositionVector.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/PositionVector.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/PositionVector.cpp -o CMakeFiles/main.dir/src/PositionVector.cpp.s
+
 CMakeFiles/main.dir/main.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/main.cpp.o: main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/main.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/main.cpp.o -c /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/main.cpp
 
 CMakeFiles/main.dir/main.cpp.i: cmake_force
@@ -86,16 +112,20 @@ CMakeFiles/main.dir/main.cpp.s: cmake_force
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/src/Astar.cpp.o" \
+"CMakeFiles/main.dir/src/GridMap.cpp.o" \
+"CMakeFiles/main.dir/src/PositionVector.cpp.o" \
 "CMakeFiles/main.dir/main.cpp.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/src/Astar.cpp.o
+main: CMakeFiles/main.dir/src/GridMap.cpp.o
+main: CMakeFiles/main.dir/src/PositionVector.cpp.o
 main: CMakeFiles/main.dir/main.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -10,6 +10,25 @@ int main()
 {
     printf("Hello World\n");
     
+    // testing agent get moves 
+    Agent agent1(2,0,0,10,10,10);
+    PositionVector pos1 = agent1.getPosition();
+    printf("agent pos %f %f %f\n", pos1.x, pos1.y, pos1.z);
+
+    std::vector<PositionVector> moves = agent1.getMoves2D(pos1);
+    // check if the moves2d is working correctly
+    for (int i=0; i < moves.size(); i++)
+    {
+        printf("moves2d %d %f %f \n", i, moves[i].x, moves[i].y);
+    }
+
+    moves = agent1.getMoves3D(agent1.getPosition());
+    // check if the moves2d is working correctly
+    for (int i=0; i < moves.size(); i++)
+    {
+        printf("moves2d %d %f %f %f\n", i, moves[i].x, moves[i].y, moves[i].z);
+    }
+
     GridMap gridmap;
 
     printf("Gridmap initialized\n");
@@ -18,7 +37,7 @@ int main()
     gridmap.getGridSizeY(), 
     gridmap.getGridSizeZ());
 
-    gridmap.setGridSize(10, 10, 10, 20, 20, 20);
+    gridmap.setGridSize(0, 0, 0, 20, 20, 20);
 
     printf("grid sizes of x y z %d %d %d\n", 
     gridmap.getGridSizeX(), 
@@ -52,18 +71,18 @@ int main()
         printf("Inside bounds\n");
 
     // This is how I will push nodes inside the open set 
-    Astar astar;
-    Node node1;
-    node1.pos = PositionVector(0, 0, 0);
-    node1.g = 0;
-    node1.h = 0;
-    node1.f = 10;
+    Astar astar(gridmap, agent1);
+    Node* node1 = new Node; 
+    node1->pos = PositionVector(0, 0, 0);
+    node1->g = 0;
+    node1->h = 0;
+    node1->f = 10;
 
-    Node node2;
-    node2.pos = PositionVector(1, 1, 1);
-    node2.g = 0;
-    node2.h = 0;
-    node2.f = 5;
+    Node* node2 = new Node;
+    node2->pos = PositionVector(1, 1, 1);
+    node2->g = 0;
+    node2->h = 0;
+    node2->f = 5;
 
     // Making sure my comparison operator works
     CompareNodeCost compare;
@@ -73,20 +92,23 @@ int main()
         printf("node2 has lower cost\n");
 
     // Making sure I pop out the minimum cost node out of the open set
-    std::priority_queue<Node, std::vector<Node>, CompareNodeCost> open_set;
+    std::priority_queue<Node*, std::vector<Node*>, CompareNodeCost> open_set;
     open_set.push(node1);
     open_set.push(node2);
 
-    Node node3 = open_set.top();
-    open_set.pop();
-    printf("node3 f %f\n", node3.f);
+    Node* node3 = new Node; 
     
+    // should be node2
     node3 = open_set.top();
-    printf("node3 f %f\n", node3.f);
     open_set.pop();
-    // printf("node3 f %f\n", node3.f);
+    printf("node3 f %f\n", node3->f);
+    
+    // should be node3
+    node3 = open_set.top();
+    printf("node3 f %f\n", node3->f);
+    open_set.pop();
 
-    // this is how I will check if I have visited a node '
+    // this is how I will check if I have visited a node '  
     // just convert the position vector as int and do a check if visited
     // std::unordered_set<PositionVector, PositionHash> closed_set;
     std::set< std::vector<int> > closed_set;
@@ -101,13 +123,19 @@ int main()
     else
         printf("not found\n");
 
-
+    // Just want to check if this will not return anything
     closed_set.find({5, 5, 5});
-
     if (closed_set.find({5, 5, 5}) != closed_set.end())
         printf("found\n");
     else
         printf("not found\n");
+
+    // // test astar isvalid
+    agent1.setPosition(3, 5, 3);
+    // moves = agent1.getMoves3D(agent1.getPosition());
+    
+    moves = astar.getLegalNeighbors(agent1.getPosition());
+
 
 
     return 0;

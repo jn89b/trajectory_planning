@@ -177,6 +177,60 @@ src/Astar.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/Astar.cpp.s
 .PHONY : src/Astar.cpp.s
 
+src/GridMap.o: src/GridMap.cpp.o
+
+.PHONY : src/GridMap.o
+
+# target to build an object file
+src/GridMap.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/GridMap.cpp.o
+.PHONY : src/GridMap.cpp.o
+
+src/GridMap.i: src/GridMap.cpp.i
+
+.PHONY : src/GridMap.i
+
+# target to preprocess a source file
+src/GridMap.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/GridMap.cpp.i
+.PHONY : src/GridMap.cpp.i
+
+src/GridMap.s: src/GridMap.cpp.s
+
+.PHONY : src/GridMap.s
+
+# target to generate assembly for a file
+src/GridMap.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/GridMap.cpp.s
+.PHONY : src/GridMap.cpp.s
+
+src/PositionVector.o: src/PositionVector.cpp.o
+
+.PHONY : src/PositionVector.o
+
+# target to build an object file
+src/PositionVector.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/PositionVector.cpp.o
+.PHONY : src/PositionVector.cpp.o
+
+src/PositionVector.i: src/PositionVector.cpp.i
+
+.PHONY : src/PositionVector.i
+
+# target to preprocess a source file
+src/PositionVector.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/PositionVector.cpp.i
+.PHONY : src/PositionVector.cpp.i
+
+src/PositionVector.s: src/PositionVector.cpp.s
+
+.PHONY : src/PositionVector.s
+
+# target to generate assembly for a file
+src/PositionVector.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/PositionVector.cpp.s
+.PHONY : src/PositionVector.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +246,12 @@ help:
 	@echo "... src/Astar.o"
 	@echo "... src/Astar.i"
 	@echo "... src/Astar.s"
+	@echo "... src/GridMap.o"
+	@echo "... src/GridMap.i"
+	@echo "... src/GridMap.s"
+	@echo "... src/PositionVector.o"
+	@echo "... src/PositionVector.i"
+	@echo "... src/PositionVector.s"
 .PHONY : help
 
 

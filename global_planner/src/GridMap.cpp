@@ -1,6 +1,86 @@
 #include "GridMap.h"
 #include <math.h>
 
+
+/* -------------------------------------------------
+    Agent CLASS
+    -------------------------------------------------
+*/
+Agent::Agent(double x, double y, double z, 
+            double goal_x, double goal_y, double goal_z, 
+            double agent_radius)
+{
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    this->position = PositionVector(this->x, this->y, this->z);
+    this->goal_position = PositionVector(goal_x, goal_y, goal_z);
+    this->agent_radius = agent_radius;
+}
+
+// -------------------------------------------------
+
+std::vector<PositionVector> Agent::getMoves3D(PositionVector current_pos)
+{   
+    // loop through i,j,k and add to moves vector
+    std::vector<PositionVector> moves;
+    int min = -1;
+    int max = 2;
+    for (int i = min; i < max; i++)
+    {
+        for (int j = min; j< max; j++)
+        {
+            for (int k = min; k < max; k++)
+            {
+                if (i == current_pos.x && 
+                    j == current_pos.y && 
+                    z == current_pos.z )
+                    continue;
+                else
+                {
+                    double x = current_pos.x + i;
+                    double y = current_pos.y + j;
+                    double z = current_pos.z + k;
+                    PositionVector move(x,y,z);
+                    moves.push_back(move);
+                }
+            }
+        }
+    }
+
+    return moves;
+}
+
+// -------------------------------------------------
+
+// return a list of possible moves in 2D
+std::vector<PositionVector> Agent::getMoves2D(PositionVector current_pos)
+{
+    std::vector<PositionVector> moves;
+    int min = -1;
+    int max = 2;
+    
+    for (int i=min; i<max; i++)
+    {
+        for (int j=min; j<max; j++)
+        {
+            if (i == current_pos.x && j == current_pos.y)
+                continue;
+            else
+            {
+                double x = current_pos.x + i;
+                double y = current_pos.y + j;
+                PositionVector move(x,y,0);
+                moves.push_back(move);
+            }
+        }
+    }
+
+    return moves;
+}
+
+// -------------------------------------------------
+
 /* -------------------------------------------------
     OBSTACLE CLASS
     -------------------------------------------------
@@ -19,13 +99,14 @@ Obstacle::Obstacle(double x, double y, double z, double radius, double height)
 
 // -------------------------------------------------
 
-bool Obstacle::isInside2D(PositionVector position)
+bool Obstacle::isInside2D(PositionVector position, double robot_radius)
 {
-    double dist = sqrt(pow(position.x - this->x, 2) 
-    + pow(position.y - this->y, 2));
-    printf("dist: %f\n", dist);
+    double total_radius = this->radius + robot_radius;
 
-    if (dist <= this->radius)
+    double dist = sqrt(pow(position.x - this->x, 2) 
+    + pow(position.y - this->y, 2)) ;
+
+    if (dist <= total_radius)
         return true;
     else
         return false;
@@ -33,7 +114,7 @@ bool Obstacle::isInside2D(PositionVector position)
 
 // -------------------------------------------------
 
-Obstacle* GridMap::getObstacle(int index)
+Obstacle *GridMap::getObstacle(int index)
 {
     Obstacle* obs = obstacle_list[index] ;
     return obs;  
@@ -41,13 +122,15 @@ Obstacle* GridMap::getObstacle(int index)
 
 // -------------------------------------------------
 
-bool Obstacle::isInside3D(PositionVector position)
+bool Obstacle::isInside3D(PositionVector position, double rob)
 {
+    double total_radius = this->radius + rob;
+
     double dist = sqrt(pow(position.x - this->x, 2) + 
         pow(position.y - this->y, 2) + 
         pow(position.z - this->z, 2));
 
-    if (dist <= this->radius)
+    if (dist <= total_radius)
         return true;
     else
         return false;
@@ -61,7 +144,7 @@ bool Obstacle::isInside3D(PositionVector position)
 
 GridMap::GridMap() 
 {
-    //initialize the grid size map
+    //initialize the grid si    ze map
     this->x_min = 0;
     this->y_min = 0;
     this->z_min = 0;
@@ -110,3 +193,14 @@ bool GridMap::isOutBounds(PositionVector position)
 }
 
 // -------------------------------------------------
+
+bool GridMap::isInsideObstacles(PositionVector position, float radius)
+{
+    for (int i=0; i<obstacle_list.size(); i++)
+    {
+        if (obstacle_list[i]->isInside2D(position))
+            return true;
+    }
+
+    return false;
+}

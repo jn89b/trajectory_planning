@@ -5,33 +5,112 @@
 #include <PositionVector.h>
 
 /* -------------------------------------------------
+    Agent CLASS
+    -------------------------------------------------
+*/
+class Agent 
+{
+    private:
+        double x;
+        double y;
+        double z;
+        
+        double goal_x;
+        double goal_y;
+        double goal_z;
+
+        double agent_radius = 0.0f; // default value
+        PositionVector position = PositionVector(
+                                    x, y, z);
+        PositionVector goal_position = PositionVector(
+                                    goal_x, goal_y, goal_z);
+
+    public:
+        // Constructor if you want set as position vectors
+        Agent(PositionVector pos, 
+            PositionVector goal_position, 
+            double agent_radius=0.0f) 
+            {
+                this->x = pos.x;
+                this->y = pos.y;
+                this->z = pos.z;
+                this->position = pos;
+                this->goal_position = goal_position;
+                this->agent_radius = agent_radius;
+            }
+        
+        // Constructor if you want set as individual doubles
+        Agent(double x, double y, double z, 
+            double goal_x, double goal_y, double goal_z, 
+            double agent_radius=0.0f);
+        
+        double getX() {return x;}
+        double getY() {return y;}
+        double getZ() {return z;}
+        
+        //setters and getters for radius of agent in meters
+        void setRadius(double radius) {agent_radius = radius;}
+        double getRadius() {return agent_radius;}
+        
+        //setter getters and update for position
+        PositionVector getPosition() {return position;}
+        void setPosition(PositionVector pos) {position = pos;}
+        void setPosition(double x, double y, double z) 
+            {position = PositionVector(x, y, z);}
+        void updatePosition(PositionVector new_pos) {position = new_pos;}
+        void updatePosition(double x, double y, double z) 
+            {position = PositionVector(x, y, z);}
+
+        //setter getters and update for goal position
+        void setGoalPosition(PositionVector goal_pos) 
+            {goal_position = goal_pos;}
+        PositionVector getGoalPosition() {return goal_position;}
+        void updateGoalPosition(PositionVector new_pos) 
+            {goal_position = new_pos;}
+        void updateGoalPosition(double x, double y, double z)
+            {goal_position = PositionVector(x, y, z);}
+
+
+        // return a vector of possible moves in 3D
+        std::vector<PositionVector> getMoves3D(PositionVector current_pos);
+
+        // return a list of possible moves in 2D
+        std::vector<PositionVector> getMoves2D(PositionVector current_pos);
+
+
+
+
+};
+
+
+/* -------------------------------------------------
     OBSTACLE CLASS
     -------------------------------------------------
 */
 class Obstacle
 {
+    //--------------PUBLIC ----------/
+    public:        
+        // Constructor
+        Obstacle(double x, double y, double z, double radius, double height);        
+        
+        double getX() {return x;}
+        double getY() {return y;}
+        double getZ() {return z;}
+        double getRadius() {return radius;}
+        double getHeight() {return height;} 
+        bool isInside2D(PositionVector position, double robot_radius=0.0f);
+        bool isInside3D(PositionVector position, double robot_radius=0.0f);
+
+    
     //--------------PUBLIC METHODS ----------/
     private:
-    double x;
-    double y;
-    double z;
-    double radius;
-    double height;
+        double x;
+        double y;
+        double z;
+        double radius;
+        double height;
     
-    public:
-    //--------------PRIVATE METHODS ----------/
-    
-    // Constructor
-    Obstacle(double x, double y, double z, double radius, double height);        
-    
-    double getX() {return x;}
-    double getY() {return y;}
-    double getZ() {return z;}
-    double getRadius() {return radius;}
-    double getHeight() {return height;}
-    bool isInside2D(PositionVector position);
-    bool isInside3D(PositionVector position);
-
 };
 
 /* -------------------------------------------------
@@ -74,6 +153,11 @@ class GridMap
         // Checks if the position is outside the grid 
         // returns true if it is outside the grid
         bool isOutBounds(PositionVector position);
+
+        // Checks the position is inside the obstacle list 
+        // returns true if it is inside the obstacle list
+        // false if it is not inside the obstacle list
+        bool isInsideObstacles(PositionVector position, float radius=0.0f);
         
         // returns the pointer obstacle based on the index
         Obstacle* getObstacle(int index);

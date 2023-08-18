@@ -78,7 +78,7 @@ std::vector<PositionVector> Astar::searchPath()
             Node* neigh_node = new Node;
             neigh_node->pos = neigh_pos;
             neigh_node->parent = current_node->pos;
-            neigh_node->g = current_node->g + 1;//computeHeuristic(current_node->pos, neigh_node->pos);
+            neigh_node->g = current_node->g + computeHeuristic(current_node->pos, neigh_node->pos);
             neigh_node->h = computeHeuristic(current_node->pos, 
                 agent_->getGoalPosition());
             neigh_node->f = neigh_node->g + neigh_node->h; 

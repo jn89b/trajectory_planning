@@ -96,11 +96,11 @@ class Obstacle
         // Constructor
         Obstacle(int x, int y, int z, double radius, int height);        
         
-        int getX() {return x;}
-        int getY() {return y;}
-        int getZ() {return z;}
-        int getRadius() {return radius;}
-        int getHeight() {return height;} 
+        int getX() const {return x;} 
+        int getY() const {return y;} 
+        int getZ() const {return z;} 
+        int getRadius() const {return radius;} 
+        int getHeight() const {return height;} 
         bool isInside2D(PositionVector position, double robot_radius=0.0f);
         bool isInside3D(PositionVector position, double robot_radius=0.0f);
 
@@ -148,9 +148,11 @@ class GridMap
 
         // Inserts an obstacle into the obstacle list 
         // and returns the number of obstacles in the list
-        int insertObstacle(Obstacle& obstacle);
+        int insertObstacle(Obstacle* obstacle);
         // returns the number of obstacles in the list
         int getNumObstacles() {return int(obstacle_list.size());}
+        // returns the list of obstacles
+        const std::vector<Obstacle*> getObstacles() {return obstacle_list;}
 
         // Checks if the position is outside the grid 
         // returns true if it is outside the grid
@@ -160,7 +162,7 @@ class GridMap
         // returns true if it is inside the obstacle list
         // false if it is not inside the obstacle list
         bool isInsideObstacles(PositionVector position, float radius=0.0f);
-        
+
         // returns the pointer obstacle based on the index
         Obstacle* getObstacle(int index);
 

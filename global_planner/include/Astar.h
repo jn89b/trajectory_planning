@@ -135,8 +135,6 @@ class Astar
         // as checks if the position is not an obstacle
         bool isValidPosition(const PositionVector& pos);
 
-        float computeTotalCost();
-
         float computeHeuristic(const PositionVector& from_pos, 
             const PositionVector& to_pos);
 

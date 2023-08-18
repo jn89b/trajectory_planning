@@ -36,6 +36,10 @@ std::vector<PositionVector> Agent::getMoves3D(PositionVector current_pos)
                     j == current_pos.y && 
                     z == current_pos.z )
                     continue;
+
+                if (i == current_pos.x && 
+                    j == current_pos.y)
+                    continue;
                 else
                 {
                     double x = current_pos.x + i;
@@ -94,7 +98,7 @@ Obstacle::Obstacle(int x, int y, int z, double radius, int height)
     this->z = z;
     this->radius = radius;
     this->height = height;
-    
+
 }
 
 // -------------------------------------------------
@@ -110,14 +114,6 @@ bool Obstacle::isInside2D(PositionVector position, double robot_radius)
         return true;
     else
         return false;
-}
-
-// -------------------------------------------------
-
-Obstacle *GridMap::getObstacle(int index)
-{
-    Obstacle* obs = obstacle_list[index] ;
-    return obs;  
 }
 
 // -------------------------------------------------
@@ -171,11 +167,15 @@ bool GridMap::setGridSize(int x_min, int y_min, int z_min,
 
 // -------------------------------------------------
 
-int GridMap::insertObstacle(Obstacle& obstacle)
+int GridMap::insertObstacle(Obstacle* obstacle)
 {
-    obstacle_list.push_back(&obstacle);
+    this->obstacle_list.push_back(obstacle);
+    printf("Inserting Obstacle %d, %d, %d\n",  
+    obstacle->getX(), obstacle->getY(), obstacle->getZ());
 
-    return int(obstacle_list.size());
+
+
+    return int(this->obstacle_list.size());
 }
 
 // -------------------------------------------------
@@ -204,3 +204,12 @@ bool GridMap::isInsideObstacles(PositionVector position, float radius)
 
     return false;
 }
+
+// -------------------------------------------------
+
+Obstacle* GridMap::getObstacle(int index)
+{
+    Obstacle* obs = obstacle_list[index] ;
+    return obs;  
+}
+

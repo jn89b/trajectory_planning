@@ -147,8 +147,8 @@ _deps/matplotplusplus-build/source/matplot/clean: _deps/matplotplusplus-build/so
 # Target rules for target CMakeFiles/main.dir
 
 # All Build rule for target.
-CMakeFiles/main.dir/all: _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/all
 CMakeFiles/main.dir/all: _deps/matplotplusplus-build/source/3rd_party/CMakeFiles/nodesoup.dir/all
+CMakeFiles/main.dir/all: _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/all
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/CMakeFiles --progress-num=1,2,3,4,5 "Built target main"

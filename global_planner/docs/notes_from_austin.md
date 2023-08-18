@@ -1,0 +1,12 @@
+# Notes from Austin
+- Fields beginning 
+- Level 0:
+  - Hover shoot land
+- Level 1:
+  - Flying a pattern 
+  - Manual targets in line 
+- Level 2:
+  - Navigating shooting quad-copter
+- Level 3:
+  - Fly sky-walker in a formation 
+  - Navigate the waypoints while its flying  

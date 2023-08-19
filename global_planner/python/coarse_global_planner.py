@@ -3,6 +3,20 @@ import math as m
 from queue import PriorityQueue
 
 import matplotlib.pyplot as plt
+import pandas as pd
+
+"""
+Paper Reference:
+Efficient Two-phase 3D Motion Planning for Small Fixed-wing UAV
+
+The Coarse planner algorithm from the paper is implemented here
+
+
+Need to snap start position like I did in the goal position
+
+Model vehicle constraints based on velocity
+
+"""
 
 class PositionVector():
     def __init__(self) -> None:
@@ -99,8 +113,11 @@ class FWAgent():
     def set_goal_state(self, position:PositionVector) -> None:
         self.goal_position = position
 
-    def vehicle_constraints(self, horizontal_min_radius_m:float=15, 
-                            max_climb_angle_dg:float=5) -> None:
+    def vehicle_constraints(self, horizontal_min_radius_m:float=35, 
+                            max_climb_angle_dg:float=10) -> None:
+        """
+        horizontal_min_turn = v^2/ (g * tan(phi)) where theta is bank angle
+        """
         self.horizontal_min_radius_m = horizontal_min_radius_m
         self.max_climb_angle_dg = max_climb_angle_dg
 
@@ -126,6 +143,7 @@ class FWAgent():
             moves.append([next_x, next_y, next_z + 1])
             moves.append([next_x, next_y, next_z - 1])
             return moves
+        # moves going in x direction
         elif(next_x != 0 and next_y == 0):
             moves.append([next_x, next_y, next_z])
             moves.append([next_x, next_y, next_z + 1])
@@ -137,6 +155,7 @@ class FWAgent():
             moves.append([next_x, next_y-1, next_z+1])
             moves.append([next_x, next_y-1, next_z-1])
             return moves
+        # moves going in y direction
         else:
             moves.append([next_x, next_y, next_z])
             moves.append([next_x, next_y, next_z + 1])
@@ -151,7 +170,6 @@ class FWAgent():
 
         # so loop around all surrounding nodes from the next_x
         #based on this next position get surrounding nodes
-        
         
 class Grid():
     """
@@ -168,9 +186,9 @@ class Grid():
                  offset_z:float=0) -> None:
         
         self.agent = agent
-        self.x_min_m = 0
-        self.y_min_m = 0
-        self.z_min_m = 0
+        self.x_min_m = -100
+        self.y_min_m = -100
+        self.z_min_m = -100
 
         self.x_max_m = x_max_m
         self.y_max_m = y_max_m
@@ -264,7 +282,14 @@ class HighLevelAstar():
         
 
     def init_nodes(self):
-        self.start_node = Node(None, self.agent.position, 
+        # Snap the start and end position to the grid
+        direction = self.agent.position.vector - self.agent.goal_position.vector
+        direction_vector = PositionVector()
+        direction_vector.set_position(direction[0], direction[1], direction[2])
+        rounded_start_position = self.grid.map_position_to_grid(
+            self.agent.position, direction_vector)
+        
+        self.start_node = Node(None, rounded_start_position, 
                                self.agent.theta_dg, self.agent.psi_dg)
         self.start_node.g = self.start_node.h = self.start_node.f = 0
         self.open_set.put((self.start_node.f, self.start_node))
@@ -299,7 +324,6 @@ class HighLevelAstar():
             scaled_move = [move[0] * self.grid.sx, 
                            move[1] * self.grid.sy, 
                            move[2] * self.grid.sz]
-            # scaled_move = [move[0], move[1], move[2]]
             scaled_position = PositionVector()
             scaled_position.set_position(current_node.position.x + scaled_move[0],
                                          current_node.position.y + scaled_move[1],
@@ -324,7 +348,10 @@ class HighLevelAstar():
         current = current_node
         
         while current is not None:
-            path.append(list(current.position.vector))
+            states = [current.position.x, current.position.y, current.position.z]
+            states.append(current.theta_dg)
+            states.append(current.psi_dg)
+            path.append(states)
             current = current.parent
         # Return reversed path as we need to show from start to end path
         path = path[::-1]
@@ -337,13 +364,13 @@ class HighLevelAstar():
 
     def search(self):
         
-        max_iterations = 100000
+        max_iterations = 1E100
         iterations = 0
 
         while (not self.open_set.empty() and iterations < max_iterations):
             
             cost,current_node = self.open_set.get()
-            print("current node", current_node.position.vector)
+            # print("current node", current_node.position.vector)
             self.closed_set[str(list(current_node.position.vector))] = current_node
 
             if current_node.position == self.goal_node.position:
@@ -351,7 +378,15 @@ class HighLevelAstar():
                 return self.return_path(current_node)
                 # return self.get_path(current_node)
 
-            for move in self.get_legal_moves(current_node, current_node.psi_dg):
+            expanded_moves = self.get_legal_moves(
+                current_node, current_node.psi_dg)
+
+            if not expanded_moves:
+                print("no expanded moves")
+                return None
+
+            for move in expanded_moves:
+
                 if str(list(move.vector)) in self.closed_set:
                     continue
                 
@@ -397,7 +432,7 @@ if __name__ == '__main__':
     # I need to snap the start position to the grid
     start_position.set_position(10,10,0)
     fw_agent = FWAgent(start_position,0, 270)
-    fw_agent.vehicle_constraints()
+    fw_agent.vehicle_constraints(horizontal_min_radius_m=25, max_climb_angle_dg=10)
     goal = PositionVector()
     goal.set_position(777,500,25)
     fw_agent.set_goal_state(goal)
@@ -418,6 +453,8 @@ if __name__ == '__main__':
     x = [wp[0] for wp in wp_path]
     y = [wp[1] for wp in wp_path]
     z = [wp[2] for wp in wp_path]
+    theta_dg = [wp[3] for wp in wp_path]
+    psi_dg = [wp[4] for wp in wp_path]
     ax.plot(x, y, '-o')
     plt.show()
 
@@ -431,6 +468,9 @@ if __name__ == '__main__':
     ax2.plot(x, y, z, '-o')
     plt.show()
 
+    #save trajectory to csv
+    df = pd.DataFrame(wp_path, columns=['x', 'y', 'z', 'theta_dg', 'psi_dg'])
+    df.to_csv('trajectory.csv', index=False)
 
 
     # compare_position = PositionVector()

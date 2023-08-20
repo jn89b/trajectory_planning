@@ -27,6 +27,7 @@ class AirplaneSimpleModel():
         self.phi_f = ca.SX.sym('phi_f')
         self.theta_f = ca.SX.sym('theta_f')
         self.psi_f = ca.SX.sym('psi_f')
+        self.u_phi = ca.SX.sym('u_phi')
 
         self.states = ca.vertcat(
             self.x_f,
@@ -34,20 +35,21 @@ class AirplaneSimpleModel():
             self.z_f,
             self.phi_f,
             self.theta_f,
-            self.psi_f
+            self.psi_f,
+            self.u_phi
         )
 
         self.n_states = self.states.size()[0] #is a column vector 
 
     def define_controls(self):
         """controls for your system"""
-        self.u_phi = ca.SX.sym('u_phi')
+        self.du_phi = ca.SX.sym('du_phi')
         self.u_theta = ca.SX.sym('u_theta')
         self.u_psi = ca.SX.sym('u_psi')
         self.v_cmd = ca.SX.sym('v_cmd')
 
         self.controls = ca.vertcat(
-            self.u_phi,
+            self.du_phi,
             self.u_theta,
             self.u_psi,
             self.v_cmd
@@ -61,19 +63,21 @@ class AirplaneSimpleModel():
         self.x_fdot = self.v_cmd * ca.cos(self.theta_f) * ca.cos(self.psi_f) 
         self.y_fdot = self.v_cmd * ca.cos(self.theta_f) * ca.sin(self.psi_f)
         self.z_fdot = -self.v_cmd * ca.sin(self.theta_f)
+        self.phi_fdot = self.u_phi + self.du_phi
         
-        self.phi_fdot = self.u_phi
+
+        self.du_phi_fdot = self.du_phi    
         self.theta_fdot = self.u_theta
         self.psi_fdot = self.u_psi + (self.g * (ca.tan(self.phi_f) / self.v_cmd))
-        
+
         self.z_dot = ca.vertcat(
             self.x_fdot,
             self.y_fdot,
             self.z_fdot,
             self.phi_fdot,
+            self.du_phi_fdot,
             self.theta_fdot,
-            self.psi_fdot
-        )
+            self.psi_fdot)
 
         #ODE function
         self.function = ca.Function('f', 
@@ -90,8 +94,8 @@ class AirplaneSimpleModelMPC(MPC.MPC):
     def add_additional_constraints(self):
         """add additional constraints to the MPC problem"""
         #add control constraints
-        self.lbx['U'][0,:] = self.airplane_params['u_phi_min']
-        self.ubx['U'][0,:] = self.airplane_params['u_phi_max']
+        self.lbx['U'][0,:] = self.airplane_params['du_phi_min']
+        self.ubx['U'][0,:] = self.airplane_params['du_phi_max']
 
         self.lbx['U'][1,:] = self.airplane_params['u_theta_min']
         self.ubx['U'][1,:] = self.airplane_params['u_theta_max']
@@ -110,6 +114,9 @@ class AirplaneSimpleModelMPC(MPC.MPC):
 
         self.lbx['X'][4,:] = self.airplane_params['theta_min']
         self.ubx['X'][4,:] = self.airplane_params['theta_max']
+
+        self.lbx['X'][6,:] = self.airplane_params['u_phi_min']
+        self.ubx['X'][6,:] = self.airplane_params['u_phi_max']
 
     def solve_mpc(self, start, goal, t0=0, sim_time = 5, 
                   set_control=False, init_controls=None):
@@ -137,7 +144,9 @@ class AirplaneSimpleModelMPC(MPC.MPC):
         mpc_iter = 0
         obstacle_history = []
 
-        error_pos = 1
+        # I need to have this tuned, but it's a good starting point
+        # This is good enough
+        error_pos = 15
 
         if Config.OBSTACLE_AVOID:
             obs_x = Config.OBSTACLE_X
@@ -255,8 +264,7 @@ class AirplaneSimpleModelMPC(MPC.MPC):
         print('avg iteration time: ', np.array(times).mean() * 1000, 'ms')
         print('final error: ', ss_error)
          
-        return time_history, solution_list, obstacle_history              
-
+        return time_history, solution_list, obstacle_history          
 ## start main code
 if __name__ == "__main__":
 
@@ -264,24 +272,35 @@ if __name__ == "__main__":
     airplane.set_state_space()
 
     airplane_params = {
-        'u_psi_min': np.deg2rad(-45),
-        'u_psi_max': np.deg2rad(45),
-        'u_phi_min': np.deg2rad(-5),
-        'u_phi_max': np.deg2rad(5),
+        'u_psi_min': np.deg2rad(-60),
+        'u_psi_max': np.deg2rad(60),
+        'u_phi_min': np.deg2rad(-60),
+        'u_phi_max': np.deg2rad(60),
         'u_theta_min': np.deg2rad(-20),
         'u_theta_max': np.deg2rad(20),
         'z_min': 0.0,
         'z_max': 30.0,
-        'v_cmd_min': 5,
+        'v_cmd_min': 10,
         'v_cmd_max': 20,
         'theta_min': np.deg2rad(-10),
         'theta_max': np.deg2rad(10),
-        'phi_min': np.deg2rad(-45),
-        'phi_max': np.deg2rad(45),
+        'phi_min': np.deg2rad(-60),
+        'phi_max': np.deg2rad(60),
+        'du_phi_min': np.deg2rad(-45),
+        'du_phi_max': np.deg2rad(45)
     }  
 
-    Q = ca.diag([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
-    R = ca.diag([1.0, 1.0, 1.0, 1.0])
+    Q = ca.diag([1.0, 1.0, 1.0, 0.75, 0.75, 0.75, 0.5])
+    R = ca.diag([2.0, 2.0, 1.0, 0.2])
+
+    mpc_airplane = AirplaneSimpleModelMPC(
+        model=airplane,
+        N=20,
+        dt_val=0.1,
+        Q=Q,
+        R=R,
+        airplane_params=airplane_params
+    )
 
     mpc_airplane = AirplaneSimpleModelMPC(
         model=airplane,
@@ -311,7 +330,6 @@ if __name__ == "__main__":
     z_end = df['z'].values[idx]
     theta_end = np.deg2rad(df['theta_dg'].values[idx])
     psi_end = np.deg2rad(df['psi_dg'].values[idx])
-
         
     start = [x_start, y_start, z_start, 0, theta_start, psi_start]
     goal = [x_end, y_end, z_end, 0, theta_end, psi_end]
@@ -332,17 +350,21 @@ if __name__ == "__main__":
     theta_start = theta_wps[0]
     psi_start = psi_wps[0]
     init_controls = [0,0,0, airplane_params['v_cmd_max']]
+    phi_u = 0
+    theta_u = 0
     phi_start = 0
 
-    for i in range(1, len(x_wps)):
+    subtract_wps = 0
+    for i in range(1, len(x_wps)- subtract_wps):
         x_end = x_wps[i]
         y_end = y_wps[i]
         z_end = z_wps[i]
         theta_end = theta_wps[i]
         psi_end = psi_wps[i]
+
         
-        start = [x_start, y_start, z_start, phi_start, theta_start, psi_start]
-        goal =  [x_end,   y_end,   z_end,   phi_start, theta_start, psi_end]
+        start = [x_start, y_start, z_start, phi_start, theta_start, psi_start, phi_u]
+        goal =  [x_end,   y_end,   z_end,   phi_start, theta_start, psi_end, 0]
         if i == 1:
             some_time, solution, obstacles = mpc_airplane.solve_mpc(start, goal, init_time, 10, True
                                                                     , init_controls)
@@ -367,6 +389,8 @@ if __name__ == "__main__":
         phi_start = current_state_history[3][-1]
         theta_start = current_state_history[4][-1]
         psi_start = current_state_history[5][-1]
+        phi_u = current_state_history[6][-1]
+        # theta_u = current_state_history[7][-1]
         init_time = some_time[-1]
 
     #%% Data 

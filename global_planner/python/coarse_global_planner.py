@@ -4,7 +4,7 @@ from queue import PriorityQueue
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import random as rand
 """
 Paper Reference:
 Efficient Two-phase 3D Motion Planning for Small Fixed-wing UAV
@@ -36,8 +36,24 @@ class PositionVector():
         return list(self.vector) == list(other.vector)
 
 class Obstacle():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, position:PositionVector, radius:float) -> None:
+        self.position = position
+        self.radius = radius
+
+    def is_inside2D(self, position:PositionVector, agent_radius:float) -> bool:
+        """
+        Check if position is inside obstacle
+        """
+        total_radius = self.radius + agent_radius
+
+        dist = np.sqrt((position.x - self.position.x)**2 +
+                          (position.y - self.position.y)**2)
+        
+        if dist <= total_radius:
+            return True
+        
+        return False
+    
 
 class Node(object):
     """
@@ -100,6 +116,7 @@ class FWAgent():
         self.position = position
         self.theta_dg = theta_dg #pitch anglemoves.append([next_x, next_y, next_z])
         self.psi_dg = psi_dg # this is azmith heading
+        self.radius_m = 10 #radius of aircraft meters
 
     def set_current_state(self, position:PositionVector, 
                   theta_dg:float=0, psi_dg:float=0) -> None:
@@ -198,9 +215,13 @@ class Grid():
         self.offset_z = offset_z
 
         self.set_grid_size()
+        self.obstacles = []
 
     def get_grid_size(self) -> tuple:
         return (self.sx, self.sy, self.sz)
+
+    def insert_obstacles(self, obstacle:Obstacle) -> None:
+        self.obstacles.append(obstacle)
 
     def map_position_to_grid(self, position:PositionVector, 
                              direction_vector:PositionVector) -> PositionVector:
@@ -268,7 +289,10 @@ class Grid():
         """
         Check if position is in obstacle
         """
-        return False
+        for obstacle in self.obstacles:
+            print("Checking obstacle", obstacle.position.vector, "position", position.vector, "radius", obstacle.radius, "agent radius", self.agent.radius_m)
+            if obstacle.is_inside2D(position, self.agent.radius_m):
+                return True
 
 class HighLevelAstar():
     def __init__(self, grid:Grid) -> None:        
@@ -280,7 +304,6 @@ class HighLevelAstar():
         self.start_node = None
         self.goal_node = None
         
-
     def init_nodes(self):
         # Snap the start and end position to the grid
         direction = self.agent.position.vector - self.agent.goal_position.vector
@@ -432,14 +455,31 @@ if __name__ == '__main__':
     # I need to snap the start position to the grid
     start_position.set_position(10,10,0)
     fw_agent = FWAgent(start_position,0, 270)
-    fw_agent.vehicle_constraints(horizontal_min_radius_m=25, max_climb_angle_dg=10)
+    fw_agent.vehicle_constraints(horizontal_min_radius_m=60, 
+                                 max_climb_angle_dg=5)
     goal = PositionVector()
-    goal.set_position(777,500,25)
+    goal.set_position(777,500,50)
     fw_agent.set_goal_state(goal)
 
     grid = Grid(fw_agent)
     print(grid.sx, grid.sy, grid.sz)
     
+    #add an obstacle
+    obstacle_position = PositionVector()
+    obstacle_position.set_position(400,300,0)
+    obstacle = Obstacle(obstacle_position, 50)
+    grid.insert_obstacles(obstacle)
+
+    n_obstacles = 75
+    #set seed 
+    rand.seed(0)
+    for i in range(n_obstacles):
+        obstacle_position = PositionVector()
+        obstacle_position.set_position(rand.randint(grid.x_min_m + 100, grid.x_max_m - 100),
+                                       rand.randint(grid.y_min_m + 100 ,grid.y_max_m - 100), 0)
+        obstacle = Obstacle(obstacle_position, rand.randint(10,30))
+        grid.insert_obstacles(obstacle)
+
     high_level_astar = HighLevelAstar(grid)
     high_level_astar.init_nodes()
     wp_path = high_level_astar.search() 
@@ -456,6 +496,11 @@ if __name__ == '__main__':
     theta_dg = [wp[3] for wp in wp_path]
     psi_dg = [wp[4] for wp in wp_path]
     ax.plot(x, y, '-o')
+    # plot obstacles
+    for obstacle in grid.obstacles:
+        circle = plt.Circle((obstacle.position.x, obstacle.position.y), 
+                            obstacle.radius, color='r', fill=False)
+        ax.add_artist(circle)
     plt.show()
 
     fig2 = plt.figure()
@@ -466,6 +511,16 @@ if __name__ == '__main__':
 
     #plot the points
     ax2.plot(x, y, z, '-o')
+
+    # plot obstacles as cylinders
+    for obstacle in grid.obstacles:
+        u = np.linspace(0, 2 * np.pi, 10)
+        v = np.linspace(0, 2 * np.pi, 10)
+        x = obstacle.radius * np.outer(np.cos(u), np.sin(v)) + obstacle.position.x
+        y = obstacle.radius * np.outer(np.sin(u), np.sin(v)) + obstacle.position.y
+        z = obstacle.radius * np.outer(np.ones(np.size(u)), np.cos(v)) + obstacle.position.z
+        ax2.plot_surface(x, y, z, color='g', alpha=0.2)
+        
     plt.show()
 
     #save trajectory to csv

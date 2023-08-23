@@ -36,11 +36,11 @@ GOAL_PSI = 0
 #### OBSTACLES ####
 OBSTACLE_AVOID = False
 MOVING_OBSTACLE = False
-MULTIPLE_OBSTACLE_AVOID = False
+MULTIPLE_OBSTACLE_AVOID = True
 
-OBSTACLE_X = 10
-OBSTACLE_Y = 10
-OBSTACLE_DIAMETER = 0.1
+OBSTACLE_X = -1
+OBSTACLE_Y = -154
+OBSTACLE_DIAMETER = 75
 OBSTACLE_VX = 0.0
 OBSTACLE_VY = 0.0
 
@@ -49,12 +49,20 @@ Y_MAX = 90
 X_MIN = 10
 Y_MIN = 10
 
-N_OBSTACLES = 10 # +1 for goal
+# +1 for goal
+obs_locations = [[-1, -145], [112, -154], [21,-160], 
+                 [25, -125 ], [730,150]]
+N_OBSTACLES = len(obs_locations)
+obs_diameters = [50, 100, 50, 30, 50]
+OBSTACLES = []
 if MULTIPLE_OBSTACLE_AVOID:
-    OBSTACLES = create_obstacles(N_OBSTACLES, OBSTACLE_DIAMETER,
-        x_min=X_MIN, x_max=X_MAX, y_min=Y_MIN, y_max=Y_MAX) 
+    for obs_loc, obs_diam in zip(obs_locations, obs_diameters):
+        OBSTACLES.append([obs_loc[0], obs_loc[1], obs_diam])
+    # OBSTACLES = create_obstacles(N_OBSTACLES, OBSTACLE_DIAMETER,
+    #     x_min=X_MIN, x_max=X_MAX, y_min=Y_MIN, y_max=Y_MAX) 
 
-ROBOT_DIAMETER = 0.5
+
+ROBOT_DIAMETER = 10
 
 #NLP solver options
 MAX_ITER = 250

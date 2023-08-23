@@ -271,8 +271,8 @@ if __name__ == "__main__":
         'u_theta_max': np.deg2rad(20),
         'z_min': 0.0,
         'z_max': 30.0,
-        'v_cmd_min': 5,
-        'v_cmd_max': 10,
+        'v_cmd_min': 15,
+        'v_cmd_max': 25,
         'theta_min': np.deg2rad(-10),
         'theta_max': np.deg2rad(10),
         'phi_min': np.deg2rad(-45),
@@ -286,15 +286,15 @@ if __name__ == "__main__":
 
     mpc_airplane = AirplaneSimpleModelMPC(
         model=airplane,
-        N=20,
+        N=10,
         dt_val=0.1,
         Q=Q,
         R=R,
         airplane_params=airplane_params
     )
 
-    start = [10, 10, 0, 0, 0, Config.START_PSI, 0]
-    goal = [Config.GOAL_X, Config.GOAL_Y, 25, 0, 0, 0, 0]
+    start = [660, 110, 0, 0, 0,  np.deg2rad(45), 0]
+    goal = [770, 220, 5, 0, 0, np.deg2rad(45), 0]
 
     mpc_airplane.init_decision_variables()
     mpc_airplane.reinit_start_goal(start, goal)

@@ -292,7 +292,7 @@ if __name__ == "__main__":
         airplane_params=airplane_params
     )
 
-    df = pd.read_csv('trajectory.csv')
+    df = pd.read_csv('waypoints_15.csv')
     x_start = 0
     y_start = 0
     z_start = 0
@@ -312,7 +312,6 @@ if __name__ == "__main__":
     theta_end = np.deg2rad(df['theta_dg'].values[idx])
     psi_end = np.deg2rad(df['psi_dg'].values[idx])
 
-        
     start = [x_start, y_start, z_start, 0, theta_start, psi_start]
     goal = [x_end, y_end, z_end, 0, theta_end, psi_end]
     mpc_airplane.init_decision_variables()

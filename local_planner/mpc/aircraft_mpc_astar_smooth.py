@@ -95,7 +95,7 @@ class AirplaneSimpleModelMPC(MPC.MPC):
         """add additional constraints to the MPC problem"""
         #add control constraints
         self.lbx['U'][0,:] = self.airplane_params['du_phi_min']
-        self.ubx['U'][0,:] = self.airplane_params['du_phi_max']
+        self.ubx['U'][0,:] = self.airpuavlane_params['du_phi_max']
 
         self.lbx['U'][1,:] = self.airplane_params['u_theta_min']
         self.ubx['U'][1,:] = self.airplane_params['u_theta_max']

@@ -15,7 +15,11 @@ The Coarse planner algorithm from the paper is implemented here
 Need to snap start position like I did in the goal position
 Model vehicle constraints based on velocity
 
+Define max turn angles for aircraft
+Define leg points or grid spacing
 
+Expansion of nodes:
+    - Based on current heading and max angle turns:
 
 """
 
@@ -113,11 +117,12 @@ class Node(object):
 
 class FWAgent():
     def __init__(self, position:PositionVector, 
-                 theta_dg:float=0, psi_dg:float=0) -> None:
+                 theta_dg:float=0, psi_dg:float=0, leg_m:float=20) -> None:
         self.position = position
         self.theta_dg = theta_dg #pitch anglemoves.append([next_x, next_y, next_z])
         self.psi_dg = psi_dg # this is azmith heading
         self.radius_m = 10 #radius of aircraft meters
+        self.leg_m = leg_m #leg length in meters
 
     def set_current_state(self, position:PositionVector, 
                   theta_dg:float=0, psi_dg:float=0) -> None:
@@ -132,63 +137,57 @@ class FWAgent():
         self.goal_position = position
 
     def vehicle_constraints(self, horizontal_min_radius_m:float=35, 
-                            max_climb_angle_dg:float=10) -> None:
+                            max_climb_angle_dg:float=10, 
+                            max_psi_turn_dg:float=30) -> None:
         """
         horizontal_min_turn = v^2/ (g * tan(phi)) where theta is bank angle
         """
         self.horizontal_min_radius_m = horizontal_min_radius_m
         self.max_climb_angle_dg = max_climb_angle_dg
+        self.max_psi_turn_dg = max_psi_turn_dg
 
 
-    def get_moves(self, psi_dg:float) -> list:
+    def get_moves(self, position:PositionVector, curr_psi_dg:float,
+                  step_psi=10) -> list:
         """
         based on current position and heading get all 
         possible forward moves
         """
-        next_x = round(np.cos(np.deg2rad(psi_dg)))
-        next_y = round(np.sin(np.deg2rad(psi_dg)))
-        next_z = 0
-        moves = []
-        # #if moves are diagonal 
-        if (next_x != 0 and next_y != 0):
-            moves.append([next_x-next_x, next_y, next_z])
-            moves.append([next_x-next_x, next_y, next_z+1])
-            moves.append([next_x-next_z, next_y, next_z-1])
-            moves.append([next_x, next_y-next_y, next_z])
-            moves.append([next_x, next_y-next_y, next_z+1])
-            moves.append([next_x, next_y-next_y, next_z-1])
-            moves.append([next_x, next_y, next_z])
-            moves.append([next_x, next_y, next_z + 1])
-            moves.append([next_x, next_y, next_z - 1])
-            return moves
-        # moves going in x direction
-        elif(next_x != 0 and next_y == 0):
-            moves.append([next_x, next_y, next_z])
-            moves.append([next_x, next_y, next_z + 1])
-            moves.append([next_x, next_y, next_z - 1])
-            moves.append([next_x, next_y+1, next_z])
-            moves.append([next_x, next_y+1, next_z+1])
-            moves.append([next_x, next_y+1, next_z-1])
-            moves.append([next_x, next_y-1, next_z])
-            moves.append([next_x, next_y-1, next_z+1])
-            moves.append([next_x, next_y-1, next_z-1])
-            return moves
-        # moves going in y direction
-        else:
-            moves.append([next_x, next_y, next_z])
-            moves.append([next_x, next_y, next_z + 1])
-            moves.append([next_x, next_y, next_z - 1])
-            moves.append([next_x+1, next_y, next_z])
-            moves.append([next_x+1, next_y, next_z+1])
-            moves.append([next_x+1, next_y, next_z-1])
-            moves.append([next_x-1, next_y, next_z])
-            moves.append([next_x-1, next_y, next_z+1])
-            moves.append([next_x-1, next_y, next_z-1])
-            return moves
-
-        # so loop around all surrounding nodes from the next_x
-        #based on this next position get surrounding nodes
         
+        leg = self.leg_m
+        moves = []
+        ac_max_psi_dg = self.max_psi_turn_dg
+
+        for i in range(0,ac_max_psi_dg, step_psi):
+            next_psi_dg = curr_psi_dg + i
+            if next_psi_dg > 360:
+                next_psi_dg -= 360
+            if next_psi_dg < 0:
+                next_psi_dg += 360
+
+            psi_rad = np.deg2rad(next_psi_dg)
+            next_x = position.x + round(leg*(np.cos(psi_rad)))
+            next_y = position.y + round(leg*(np.sin(psi_rad)))
+            for z in range(-1,2,1):
+                next_z = position.z + z
+                moves.append([next_x, next_y, next_z])
+
+        for i in range(0,ac_max_psi_dg, step_psi):
+            next_psi_dg = curr_psi_dg - i
+            if next_psi_dg > 360:
+                next_psi_dg -= 360
+            if next_psi_dg < 0:
+                next_psi_dg += 360        
+
+            psi_rad = np.deg2rad(next_psi_dg)
+            next_x = position.x + round(leg*(np.cos(psi_rad)))
+            next_y = position.y + round(leg*(np.sin(psi_rad)))
+            for z in range(-1,2,1):
+                next_z = position.z + z
+                moves.append([next_x, next_y, next_z])
+
+        return moves
+    
 class Grid():
     """
     Set grid size based on agent constraints
@@ -325,7 +324,9 @@ class HighLevelAstar():
             self.agent.goal_position, direction_vector)
         
         print("rounded goal position", rounded_goal_position.vector)
-        self.goal_node = Node(None, rounded_goal_position)
+        # self.goal_node = Node(None, rounded_goal_position)
+        self.goal_node = Node(None, self.agent.goal_position, 
+                              self.agent.theta_dg, self.agent.psi_dg)
         self.goal_node.g = self.goal_node.h = self.goal_node.f = 0
 
     def is_valid_position(self, position:PositionVector) -> bool:
@@ -339,18 +340,15 @@ class HighLevelAstar():
         
     def get_legal_moves(self, current_node:Node, psi_dg:float)-> list:
         """Get legal moves based on agent constraints"""
-        moves = self.agent.get_moves(psi_dg)
+        moves = self.agent.get_moves(current_node.position, psi_dg)
         legal_moves = []
 
         # need to scale moves based on grid size
         for move in moves:
-            scaled_move = [move[0] * self.grid.sx, 
-                           move[1] * self.grid.sy, 
-                           move[2] * self.grid.sz]
+            scaled_move = [move[0], move[1], move[2]]
             scaled_position = PositionVector()
-            scaled_position.set_position(current_node.position.x + scaled_move[0],
-                                         current_node.position.y + scaled_move[1],
-                                         current_node.position.z + scaled_move[2])
+            scaled_position.set_position(
+                scaled_move[0], scaled_move[1], scaled_move[2])
             if self.is_valid_position(scaled_position):
                 legal_moves.append(scaled_position)
 
@@ -389,7 +387,7 @@ class HighLevelAstar():
 
     def search(self):
         
-        max_iterations = 1E100
+        max_iterations = 10000
         iterations = 0
 
         while (not self.open_set.empty() and iterations < max_iterations):
@@ -401,17 +399,24 @@ class HighLevelAstar():
             if current_node.position == self.goal_node.position:
                 print("found goal", current_node.position)
                 return self.return_path(current_node)
-                # return self.get_path(current_node)
+
+
+            if self.compute_distance(current_node, self.goal_node) < self.agent.leg_m:
+                print("found goal", current_node.position)
+                return self.return_path(current_node)
 
             expanded_moves = self.get_legal_moves(
                 current_node, current_node.psi_dg)
 
+            # print("current position", current_node.position.vector)
+
             if not expanded_moves:
                 # print("no expanded moves")
-                return None
+                # print("current node", current_node.position.vector)
+                continue
+                return self.closed_set, self.open_set
 
             for move in expanded_moves:
-
                 if str(list(move.vector)) in self.closed_set:
                     continue
                 
@@ -419,15 +424,16 @@ class HighLevelAstar():
                     continue
 
                 neighbor = Node(current_node, move)
-
                 neighbor.g = current_node.g + 1 #self.compute_distance(current_node, neighbor)
                 neighbor.h = self.compute_distance(neighbor, self.goal_node)
-                neighbor.f = neighbor.g + neighbor.h
+                neighbor.f = neighbor.g + 1*neighbor.h
                 self.open_set.put((neighbor.f, neighbor))
             
             iterations += 1
 
         print("no path found")
+        return self.closed_set, self.open_set
+
 
 def test_crap():
     start_position = PositionVector()
@@ -467,14 +473,13 @@ def get_diff_paths(agent:FWAgent, horizon_min_radius_m:float,
     obstacle = Obstacle(obstacle_position, 50)
     grid.insert_obstacles(obstacle)
 
-    n_obstacles = 75
+    n_obstacles = 100
     #set seed 
     rand.seed(seed_num)
     for i in range(n_obstacles):
 
-
         obstacle_position = PositionVector()
-        obstacle_position.set_position(rand.randint(grid.x_min_m + 150, grid.x_max_m - 200),
+        obstacle_position.set_position(rand.randint(grid.x_min_m + 150, grid.x_max_m - 300),
                                        rand.randint(grid.y_min_m + 150 ,grid.y_max_m - 300), 0)
         obstacle = Obstacle(obstacle_position, rand.randint(10,30))
 
@@ -492,20 +497,60 @@ def get_diff_paths(agent:FWAgent, horizon_min_radius_m:float,
 
     return grid,wp_path
 
+def print_fan():
+    """
+    Sanity check to make sure the fan concept works from SAS
+    """
+    curr_psi_dg = 350
+    test_moves = fw_agent.get_moves(
+        start_position, curr_psi_dg, aircraft_max_turn_dg)
+        
+    #create a 3D plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    for move in test_moves:
+        ax.scatter(move[0], 
+                   move[1], 
+                   move[2], c='b', marker='o')
+    
+    ax.scatter(start_position.x, start_position.y, start_position.z, c='r', marker='o', s=100)
+    #direction vector of start position
+    x_dir = np.cos(np.deg2rad(curr_psi_dg))
+    y_dir = np.sin(np.deg2rad(curr_psi_dg))
+    z_dir = start_position.z
+    print("x_dir", x_dir)
+    print("y_dir", y_dir)
+    print("z_dir", z_dir)
+
+
+    ax.quiver(start_position.x, start_position.y, start_position.z,
+                x_dir, y_dir, z_dir, length=5, normalize=True)
+    # ax.scatter(x_dir, y_dir, z_dir, c='g', marker='o', s=100)
+
+    plt.show()
+
+
 if __name__ == '__main__':
+    plt.close('all')
     start_position = PositionVector()
     # I need to snap the start position to the grid
-    start_position.set_position(777,500,52)
-    fw_agent = FWAgent(start_position,0, 270)
+    start_position.set_position(0,0,0)
+    fw_agent = FWAgent(start_position,0, 0)
     fw_agent.vehicle_constraints(horizontal_min_radius_m=60, 
                                  max_climb_angle_dg=5)
     goal = PositionVector()
-    goal.set_position(10,10,0)
+    goal.set_position(775,500,25)
     fw_agent.set_goal_state(goal)
 
-    aircraft_speeds_ms = [15,30, 25,30,35,40]
+    aircraft_speeds_ms = [15]
     aircraft_max_roll_dg = 45
     aircraft_max_pitch_dg = 5
+    aircraft_max_turn_dg = 20
+
 
     grids = []
     wp_paths = []
@@ -515,93 +560,17 @@ if __name__ == '__main__':
         grid,wp_path = get_diff_paths(
             fw_agent, max_radius_m, aircraft_max_pitch_dg, seed_num=2)
         wp_paths.append(wp_path)
-        
-    # grid = Grid(fw_agent)
-    
-    # #add an obstacle
-    # obstacle_position = PositionVector()
-    # obstacle_position.set_position(400,300,0)
-    # obstacle = Obstacle(obstacle_position, 50)
-    # grid.insert_obstacles(obstacle)
-
-    # n_obstacles = 75
-    # #set seed 
-    # rand.seed(0)
-    # for i in range(n_obstacles):
-    #     obstacle_position = PositionVector()
-    #     obstacle_position.set_position(rand.randint(grid.x_min_m + 100, grid.x_max_m - 100),
-    #                                    rand.randint(grid.y_min_m + 100 ,grid.y_max_m - 100), 0)
-    #     obstacle = Obstacle(obstacle_position, rand.randint(10,30))
-    #     grid.insert_obstacles(obstacle)
-
-    # high_level_astar = HighLevelAstar(grid)
-    # high_level_astar.init_nodes()
-    # wp_path = high_level_astar.search() 
-
-    #plot path
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # ax.set_xlabel('X')
-    # ax.set_ylabel('Y')
-    # # ax.set_zlabel('Z')
-    # x = [wp[0] for wp in wp_path]
-    # y = [wp[1] for wp in wp_path]
-    # z = [wp[2] for wp in wp_path]
-    # theta_dg = [wp[3] for wp in wp_path]
-    # psi_dg = [wp[4] for wp in wp_path]
-    # ax.plot(x, y, '-o')
-    # # plot obstacles
-    # for obstacle in grid.obstacles:
-    #     circle = plt.Circle((obstacle.position.x, obstacle.position.y), 
-    #                         obstacle.radius, color='r', fill=False)
-    #     ax.add_artist(circle)
-    # plt.show()
-
-    # fig2 = plt.figure()
-    # ax2 = fig2.add_subplot(111, projection='3d')
-    # ax2.set_xlabel('X')
-    # ax2.set_ylabel('Y')
-    # ax2.set_zlabel('Z')
-
-    # #plot the points
-    # ax2.plot(x, y, z, '-o')
-
-    # # plot obstacles as cylinders
-    # for obstacle in grid.obstacles:
-    #     u = np.linspace(0, 2 * np.pi, 10)
-    #     v = np.linspace(0, 2 * np.pi, 10)
-    #     x = obstacle.radius * np.outer(np.cos(u), np.sin(v)) + obstacle.position.x
-    #     y = obstacle.radius * np.outer(np.sin(u), np.sin(v)) + obstacle.position.y
-    #     z = obstacle.radius * np.outer(np.ones(np.size(u)), np.cos(v)) + obstacle.position.z
-    #     ax2.plot_surface(x, y, z, color='g', alpha=0.2)
-        
-    # plt.show()
-
-    #save trajectory to csv
-    df = pd.DataFrame(wp_path, columns=['x', 'y', 'z', 'theta_dg', 'psi_dg'])
-    df.to_csv('trajectory.csv', index=False)
-
-    fig3 = plt.figure()
-    ax3 = fig3.add_subplot(111, projection='3d')
-
-    for speed_ms,wp_path in zip(aircraft_speeds_ms,wp_paths):
-        if wp_path is None:
-            continue
-
-        x_path = [wp[0] for wp in wp_path]
-        y_path = [wp[1] for wp in wp_path]
-        z_path = [wp[2] for wp in wp_path]
-        ax3.plot(x_path, y_path, z_path, '-o', label=str(speed_ms) + ' m/s')
-
-    ax3.legend()
-    plt.show()
 
 
     fig4 = plt.figure()
     ax4 = fig4.add_subplot(111)
     for speed,wp_path in zip(aircraft_speeds_ms,wp_paths):
-        if wp_path is None:
-            continue
+        # if wp_path is None:
+        #     continue
+        
+        # if len(wp_path) > 1:
+        #     continue
+
         x_path = [wp[0] for wp in wp_path]
         y_path = [wp[1] for wp in wp_path]
         ax4.plot(x_path, y_path, '-o', label=str(speed) + ' m/s')
@@ -612,24 +581,34 @@ if __name__ == '__main__':
                             obstacle.radius, color='r', fill=False)
         ax4.add_artist(circle)
 
-    #plot goal
-    ax4.scatter(fw_agent.goal_position.x, fw_agent.goal_position.y, 
-                c='b', marker='x', s=100)
-    ax4.legend()
+
     plt.show()
 
-    #save waypoints to csv
-    for speed,wp_path in zip(aircraft_speeds_ms,wp_paths):
-        if wp_path is None:
-            continue
-        df = pd.DataFrame(wp_path, columns=['x', 'y', 'z', 'theta_dg', 'psi_dg'])
-        df.to_csv('waypoints_' + str(speed) + '.csv', index=False)
+    #key dictionary
+    failed_set = wp_paths[0][0]
+    print(failed_set)
+    open_set = list(wp_paths[0][1].queue)
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
 
-    #save obstacles to csv
-    obs_info = []
-    for obs in grid.obstacles:
-        obs_info.append([obs.position.x, obs.position.y, obs.position.z, obs.radius])
+    for k,v in failed_set.items():
+        print(v.psi_dg)
+        print(v.position.vector)
+        positon = v.position.vector
+        ax1.scatter(positon[0], positon[1], c='r', marker='o', s=10)
+
+    #convert open set to list
+    for info in open_set:
+        node = info[1] 
+        ax1.scatter(node.position.x, node.position.y, 
+                    c='b', marker='o', s=10)
+
+    for obstacle in grid.obstacles:
+        circle = plt.Circle((obstacle.position.x, obstacle.position.y), 
+                            obstacle.radius, color='r', fill=False)
+        ax1.add_artist(circle)
 
 
-    df = pd.DataFrame(obs_info, columns=['x', 'y', 'z', 'radius'])
-    df.to_csv('obstacles.csv', index=False)
+    plt.show()
+        
+

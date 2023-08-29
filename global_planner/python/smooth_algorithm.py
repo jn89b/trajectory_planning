@@ -40,7 +40,7 @@ if __name__ == '__main__':
     obstacles = np.array([obs_x,obs_y,obs_radius]).T
 
     speed = 40
-    waypoints = pd.read_csv('waypoints_'+str(speed)+'.csv')
+    waypoints = pd.read_csv('trajectory.csv')
 
     x_steps = []
     y_steps = []

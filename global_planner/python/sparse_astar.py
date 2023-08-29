@@ -5,6 +5,7 @@ from queue import PriorityQueue
 import matplotlib.pyplot as plt
 import pandas as pd
 import random as rand
+import time
 """
 Paper Reference:
 Efficient Two-phase 3D Motion Planning for Small Fixed-wing UAV
@@ -22,6 +23,7 @@ Expansion of nodes:
     - Based on current heading and max angle turns:
 
 """
+
 
 class PositionVector():
     def __init__(self) -> None:
@@ -107,17 +109,25 @@ class Node(object):
     
     # Compare nodes
     def __eq__(self, other):
-        return self.position == other.position and \
-            self.theta_dg == other.theta_dg
-
+        return self.position == other.position 
     # Print node
     def __repr__(self):
         return ('({0},{1})'.format(self.position, self.f))
 
 
+class Radar():
+    def __init__(self, position:PositionVector, range_m:float) -> None:
+        self.position = position
+        self.range_m = range_m
+
+    def compute_detection(self, position:PositionVector) -> float:
+        return None
+
+
+
 class FWAgent():
     def __init__(self, position:PositionVector, 
-                 theta_dg:float=0, psi_dg:float=0, leg_m:float=20) -> None:
+                 theta_dg:float=0, psi_dg:float=0, leg_m:float=50) -> None:
         self.position = position
         self.theta_dg = theta_dg #pitch anglemoves.append([next_x, next_y, next_z])
         self.psi_dg = psi_dg # this is azmith heading
@@ -138,7 +148,7 @@ class FWAgent():
 
     def vehicle_constraints(self, horizontal_min_radius_m:float=35, 
                             max_climb_angle_dg:float=10, 
-                            max_psi_turn_dg:float=30) -> None:
+                            max_psi_turn_dg:float=45) -> None:
         """
         horizontal_min_turn = v^2/ (g * tan(phi)) where theta is bank angle
         """
@@ -148,17 +158,16 @@ class FWAgent():
 
 
     def get_moves(self, position:PositionVector, curr_psi_dg:float,
-                  step_psi=10) -> list:
+                  step_psi=5) -> list:
         """
         based on current position and heading get all 
         possible forward moves
         """
         
-        leg = self.leg_m
         moves = []
         ac_max_psi_dg = self.max_psi_turn_dg
 
-        for i in range(0,ac_max_psi_dg, step_psi):
+        for i in range(0,ac_max_psi_dg+step_psi, step_psi):
             next_psi_dg = curr_psi_dg + i
             if next_psi_dg > 360:
                 next_psi_dg -= 360
@@ -166,13 +175,13 @@ class FWAgent():
                 next_psi_dg += 360
 
             psi_rad = np.deg2rad(next_psi_dg)
-            next_x = position.x + round(leg*(np.cos(psi_rad)))
-            next_y = position.y + round(leg*(np.sin(psi_rad)))
+            next_x = position.x + round(self.leg_m*(np.cos(psi_rad)))
+            next_y = position.y + round(self.leg_m*(np.sin(psi_rad)))
             for z in range(-1,2,1):
                 next_z = position.z + z
                 moves.append([next_x, next_y, next_z])
 
-        for i in range(0,ac_max_psi_dg, step_psi):
+        for i in range(0,ac_max_psi_dg+step_psi, step_psi):
             next_psi_dg = curr_psi_dg - i
             if next_psi_dg > 360:
                 next_psi_dg -= 360
@@ -180,12 +189,11 @@ class FWAgent():
                 next_psi_dg += 360        
 
             psi_rad = np.deg2rad(next_psi_dg)
-            next_x = position.x + round(leg*(np.cos(psi_rad)))
-            next_y = position.y + round(leg*(np.sin(psi_rad)))
+            next_x = position.x + round(self.leg_m*(np.cos(psi_rad)))
+            next_y = position.y + round(self.leg_m*(np.sin(psi_rad)))
             for z in range(-1,2,1):
                 next_z = position.z + z
                 moves.append([next_x, next_y, next_z])
-
         return moves
     
 class Grid():
@@ -243,7 +251,7 @@ class Grid():
         if direction_vector.x > 0:
             x_round = self.sx * m.ceil(position.x/self.sx)
         else:
-            x_round = self.sx * m.floor(position.x/self.sx)
+            x_round = self.sx * m.floor(position.x/self.        sx)
             
         if direction_vector.y > 0:
             y_round = self.sy * m.ceil(position.y/self.sy)
@@ -316,14 +324,6 @@ class HighLevelAstar():
         self.start_node.g = self.start_node.h = self.start_node.f = 0
         self.open_set.put((self.start_node.f, self.start_node))
 
-        #snap the goal to the grid 
-        direction = self.agent.goal_position.vector - self.agent.position.vector
-        direction_vector = PositionVector()
-        direction_vector.set_position(direction[0], direction[1], direction[2])
-        rounded_goal_position = self.grid.map_position_to_grid(
-            self.agent.goal_position, direction_vector)
-        
-        print("rounded goal position", rounded_goal_position.vector)
         # self.goal_node = Node(None, rounded_goal_position)
         self.goal_node = Node(None, self.agent.goal_position, 
                               self.agent.theta_dg, self.agent.psi_dg)
@@ -387,32 +387,46 @@ class HighLevelAstar():
 
     def search(self):
         
-        max_iterations = 10000
+        max_iterations = 5000
         iterations = 0
+        
+        start_time = time.time()
+        max_time = 10 #seconds
 
         while (not self.open_set.empty() and iterations < max_iterations):
-            
+
+            iterations += 1
             cost,current_node = self.open_set.get()
             # print("current node", current_node.position.vector)
+            # print("current node psi", current_node.psi_dg)
+                
             self.closed_set[str(list(current_node.position.vector))] = current_node
 
-            if current_node.position == self.goal_node.position:
-                print("found goal", current_node.position)
+            current_time = time.time() - start_time
+
+            if current_time > max_time:
+                print("reached time limit", current_time)
                 return self.return_path(current_node)
 
+            if current_node.position == self.goal_node.position:
+                print("time", current_time)
+                print("found goal", current_node.position)
+                return self.return_path(current_node)
+            
+            if iterations >= max_iterations:
+                print("iterations", iterations)
+                return self.return_path(current_node)
+                # break
 
             if self.compute_distance(current_node, self.goal_node) < self.agent.leg_m:
+                print("time", current_time)
                 print("found goal", current_node.position)
                 return self.return_path(current_node)
 
             expanded_moves = self.get_legal_moves(
                 current_node, current_node.psi_dg)
 
-            # print("current position", current_node.position.vector)
-
             if not expanded_moves:
-                # print("no expanded moves")
-                # print("current node", current_node.position.vector)
                 continue
                 return self.closed_set, self.open_set
 
@@ -424,15 +438,14 @@ class HighLevelAstar():
                     continue
 
                 neighbor = Node(current_node, move)
-                neighbor.g = current_node.g + 1 #self.compute_distance(current_node, neighbor)
+                neighbor.g = current_node.g + 1#self.compute_distance(current_node, neighbor)
                 neighbor.h = self.compute_distance(neighbor, self.goal_node)
                 neighbor.f = neighbor.g + 1*neighbor.h
                 self.open_set.put((neighbor.f, neighbor))
             
-            iterations += 1
-
         print("no path found")
-        return self.closed_set, self.open_set
+        # return self.closed_set, self.open_set
+        return self.return_path(current_node)
 
 
 def test_crap():
@@ -473,15 +486,15 @@ def get_diff_paths(agent:FWAgent, horizon_min_radius_m:float,
     obstacle = Obstacle(obstacle_position, 50)
     grid.insert_obstacles(obstacle)
 
-    n_obstacles = 100
+    n_obstacles = 150
     #set seed 
     rand.seed(seed_num)
     for i in range(n_obstacles):
 
         obstacle_position = PositionVector()
-        obstacle_position.set_position(rand.randint(grid.x_min_m + 150, grid.x_max_m - 300),
-                                       rand.randint(grid.y_min_m + 150 ,grid.y_max_m - 300), 0)
-        obstacle = Obstacle(obstacle_position, rand.randint(10,30))
+        obstacle_position.set_position(rand.randint(grid.x_min_m + 150, grid.x_max_m - 200),
+                                       rand.randint(grid.y_min_m + 150 ,grid.y_max_m - 200), 0)
+        obstacle = Obstacle(obstacle_position, rand.randint(10,40))
 
         if obstacle.is_inside2D(agent.position, agent.radius_m + 10):
             continue
@@ -526,31 +539,33 @@ def print_fan():
     print("y_dir", y_dir)
     print("z_dir", z_dir)
 
-
     ax.quiver(start_position.x, start_position.y, start_position.z,
                 x_dir, y_dir, z_dir, length=5, normalize=True)
     # ax.scatter(x_dir, y_dir, z_dir, c='g', marker='o', s=100)
 
     plt.show()
 
-
+#%%
 if __name__ == '__main__':
     plt.close('all')
     start_position = PositionVector()
     # I need to snap the start position to the grid
-    start_position.set_position(0,0,0)
-    fw_agent = FWAgent(start_position,0, 0)
+    start_position.set_position(-250,-150,0)
+    fw_agent_psi_dg = 180
+    fw_agent = FWAgent(start_position, 0, fw_agent_psi_dg)
     fw_agent.vehicle_constraints(horizontal_min_radius_m=60, 
                                  max_climb_angle_dg=5)
+    fw_agent.leg_m = 5
+    
+    
     goal = PositionVector()
-    goal.set_position(775,500,25)
+    goal.set_position(750,750,25)
     fw_agent.set_goal_state(goal)
 
     aircraft_speeds_ms = [15]
     aircraft_max_roll_dg = 45
     aircraft_max_pitch_dg = 5
     aircraft_max_turn_dg = 20
-
 
     grids = []
     wp_paths = []
@@ -562,18 +577,20 @@ if __name__ == '__main__':
         wp_paths.append(wp_path)
 
 
+    #%%
     fig4 = plt.figure()
     ax4 = fig4.add_subplot(111)
     for speed,wp_path in zip(aircraft_speeds_ms,wp_paths):
         # if wp_path is None:
         #     continue
         
-        # if len(wp_path) > 1:
-        #     continue
+        if len(wp_path) == 2:
+            continue
 
         x_path = [wp[0] for wp in wp_path]
         y_path = [wp[1] for wp in wp_path]
         ax4.plot(x_path, y_path, '-o', label=str(speed) + ' m/s')
+        ax4.plot(goal.x, goal.y, 'x')
 
     # plot obstacles
     for obstacle in grid.obstacles:
@@ -581,21 +598,22 @@ if __name__ == '__main__':
                             obstacle.radius, color='r', fill=False)
         ax4.add_artist(circle)
 
+    #save obstacles to csv
+    obs_info = []
+    for obs in grid.obstacles:
+        obs_info.append([obs.position.x, obs.position.y, obs.position.z, obs.radius])
 
-    plt.show()
+    #save trajectory to csv
+    df = pd.DataFrame(wp_path, columns=['x', 'y', 'z', 'theta_dg', 'psi_dg'])
+    df.to_csv('trajectory.csv', index=False)
+    df = pd.DataFrame(obs_info, columns=['x', 'y', 'z', 'radius'])
+    df.to_csv('obstacles.csv', index=False)
 
-    #key dictionary
     failed_set = wp_paths[0][0]
-    print(failed_set)
     open_set = list(wp_paths[0][1].queue)
+
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111)
-
-    for k,v in failed_set.items():
-        print(v.psi_dg)
-        print(v.position.vector)
-        positon = v.position.vector
-        ax1.scatter(positon[0], positon[1], c='r', marker='o', s=10)
 
     #convert open set to list
     for info in open_set:
@@ -607,8 +625,6 @@ if __name__ == '__main__':
         circle = plt.Circle((obstacle.position.x, obstacle.position.y), 
                             obstacle.radius, color='r', fill=False)
         ax1.add_artist(circle)
-
-
-    plt.show()
+    # plt.show()
         
 

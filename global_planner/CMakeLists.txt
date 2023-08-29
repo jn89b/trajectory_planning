@@ -26,7 +26,6 @@ endif()
 #include Eigen
 include_directories(/usr/include/eigen3)
 
-
 # Create a sources variable with a link to all cpp files to compile
 set(SOURCES
     src/Astar.cpp
@@ -34,12 +33,11 @@ set(SOURCES
     src/PositionVector.cpp
 )
 
-# Add an executable with the above sources
-# add_executable(taylor_methods src/taylor_methods.cpp)
-# add_executable(euler_methods src/euler_methods.cpp)
-
 # add_executable(main ${SOURCES} main.cpp)
 add_executable(main ${SOURCES} sim_astar.cpp)
+add_executable(sas_main ${SOURCES} main_sas.cpp)
+
+# add_executable(test_astar ${SOURCES} sim_astar.cpp)
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/
@@ -48,4 +46,13 @@ target_include_directories(main
         ${PROJECT_SOURCE_DIR}/include
 )
 
+target_include_directories(sas_main
+    PRIVATE 
+        ${PROJECT_SOURCE_DIR}/include
+)
+
+
 target_link_libraries(main PUBLIC matplot)
+target_link_libraries(sas_main PUBLIC matplot)
+
+# target_link_libraries(test_astar PUBLIC matplot)

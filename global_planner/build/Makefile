@@ -157,6 +157,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named sas_main
+
+# Build rule for target.
+sas_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sas_main
+.PHONY : sas_main
+
+# fast build rule for target.
+sas_main/fast:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/build
+.PHONY : sas_main/fast
+
+#=============================================================================
 # Target rules for targets named main
 
 # Build rule for target.
@@ -195,6 +208,33 @@ matplot/fast:
 	$(MAKE) -f _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/build.make _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/build
 .PHONY : matplot/fast
 
+main_sas.o: main_sas.cpp.o
+
+.PHONY : main_sas.o
+
+# target to build an object file
+main_sas.cpp.o:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/main_sas.cpp.o
+.PHONY : main_sas.cpp.o
+
+main_sas.i: main_sas.cpp.i
+
+.PHONY : main_sas.i
+
+# target to preprocess a source file
+main_sas.cpp.i:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/main_sas.cpp.i
+.PHONY : main_sas.cpp.i
+
+main_sas.s: main_sas.cpp.s
+
+.PHONY : main_sas.s
+
+# target to generate assembly for a file
+main_sas.cpp.s:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/main_sas.cpp.s
+.PHONY : main_sas.cpp.s
+
 sim_astar.o: sim_astar.cpp.o
 
 .PHONY : sim_astar.o
@@ -228,6 +268,7 @@ src/Astar.o: src/Astar.cpp.o
 
 # target to build an object file
 src/Astar.cpp.o:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/Astar.cpp.o
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/Astar.cpp.o
 .PHONY : src/Astar.cpp.o
 
@@ -237,6 +278,7 @@ src/Astar.i: src/Astar.cpp.i
 
 # target to preprocess a source file
 src/Astar.cpp.i:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/Astar.cpp.i
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/Astar.cpp.i
 .PHONY : src/Astar.cpp.i
 
@@ -246,6 +288,7 @@ src/Astar.s: src/Astar.cpp.s
 
 # target to generate assembly for a file
 src/Astar.cpp.s:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/Astar.cpp.s
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/Astar.cpp.s
 .PHONY : src/Astar.cpp.s
 
@@ -255,6 +298,7 @@ src/GridMap.o: src/GridMap.cpp.o
 
 # target to build an object file
 src/GridMap.cpp.o:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/GridMap.cpp.o
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/GridMap.cpp.o
 .PHONY : src/GridMap.cpp.o
 
@@ -264,6 +308,7 @@ src/GridMap.i: src/GridMap.cpp.i
 
 # target to preprocess a source file
 src/GridMap.cpp.i:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/GridMap.cpp.i
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/GridMap.cpp.i
 .PHONY : src/GridMap.cpp.i
 
@@ -273,6 +318,7 @@ src/GridMap.s: src/GridMap.cpp.s
 
 # target to generate assembly for a file
 src/GridMap.cpp.s:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/GridMap.cpp.s
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/GridMap.cpp.s
 .PHONY : src/GridMap.cpp.s
 
@@ -282,6 +328,7 @@ src/PositionVector.o: src/PositionVector.cpp.o
 
 # target to build an object file
 src/PositionVector.cpp.o:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/PositionVector.cpp.o
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/PositionVector.cpp.o
 .PHONY : src/PositionVector.cpp.o
 
@@ -291,6 +338,7 @@ src/PositionVector.i: src/PositionVector.cpp.i
 
 # target to preprocess a source file
 src/PositionVector.cpp.i:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/PositionVector.cpp.i
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/PositionVector.cpp.i
 .PHONY : src/PositionVector.cpp.i
 
@@ -300,6 +348,7 @@ src/PositionVector.s: src/PositionVector.cpp.s
 
 # target to generate assembly for a file
 src/PositionVector.cpp.s:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/src/PositionVector.cpp.s
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/PositionVector.cpp.s
 .PHONY : src/PositionVector.cpp.s
 
@@ -315,9 +364,13 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... sas_main"
 	@echo "... main"
 	@echo "... nodesoup"
 	@echo "... matplot"
+	@echo "... main_sas.o"
+	@echo "... main_sas.i"
+	@echo "... main_sas.s"
 	@echo "... sim_astar.o"
 	@echo "... sim_astar.i"
 	@echo "... sim_astar.s"

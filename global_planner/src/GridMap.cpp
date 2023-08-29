@@ -1,7 +1,6 @@
 #include "GridMap.h"
 #include <math.h>
 
-
 /* -------------------------------------------------
     Agent CLASS
     -------------------------------------------------
@@ -80,6 +79,59 @@ std::vector<PositionVector> Agent::getMoves2D(PositionVector current_pos)
         }
     }
 
+    return moves;
+}
+
+/* -------------------------------------------------
+    FWAgent CLASS
+    -------------------------------------------------
+*/
+
+// -------------------------------------------------
+std::vector<PositionVector> FWAgent::getMoves3D(
+    PositionVector current_pos, float curr_psi_dg, 
+    int step_psi_dg)
+{
+    std::vector <PositionVector> moves;
+    // Fan from current -> current + max_turn_psi
+    for (int i=0; i<=int(max_psi_turn_dg); i+=step_psi_dg)
+    {
+        float next_psi_dg = curr_psi_dg + i;
+        if (next_psi_dg > 360)
+            next_psi_dg -= 360;
+        if (next_psi_dg < 0)
+            next_psi_dg += 360;
+
+        float psi_rad = next_psi_dg * M_PI / 180;
+        float next_x = current_pos.x + round(leg_segment_m * cos(psi_rad));
+        float next_y = current_pos.y + round(leg_segment_m * sin(psi_rad));
+        for (int j=-1; j < 2; j++)
+        {
+            float next_z = current_pos.z + j;
+            PositionVector next_move(next_x, next_y, next_z);
+            moves.push_back(next_move);
+        }
+    }   
+
+    // Fan from current -> current - max_turn_psi
+    for (int i=0; i<=int(max_psi_turn_dg); i+=step_psi_dg)
+    {
+        float next_psi_dg = curr_psi_dg - i;
+        if (next_psi_dg > 360)
+            next_psi_dg -= 360;
+        if (next_psi_dg < 0)
+            next_psi_dg += 360;
+
+        float psi_rad = next_psi_dg * M_PI / 180;
+        float next_x = current_pos.x + round(leg_segment_m * cos(psi_rad));
+        float next_y = current_pos.y + round(leg_segment_m * sin(psi_rad));
+        for (int j=-1; j < 2; j++)
+        {
+            float next_z = current_pos.z + j;
+            PositionVector next_move(next_x, next_y, next_z);
+            moves.push_back(next_move);
+        }
+    }
     return moves;
 }
 

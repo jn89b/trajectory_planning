@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/justin/coding_projects/dstar_projects/trajectory_planni
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/sas_main.dir/all
 all: CMakeFiles/main.dir/all
 
 .PHONY : all
@@ -63,6 +64,7 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/sas_main.dir/clean
 clean: CMakeFiles/main.dir/clean
 clean: _deps/matplotplusplus-build/clean
 
@@ -144,11 +146,39 @@ _deps/matplotplusplus-build/source/matplot/clean: _deps/matplotplusplus-build/so
 .PHONY : _deps/matplotplusplus-build/source/matplot/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/sas_main.dir
+
+# All Build rule for target.
+CMakeFiles/sas_main.dir/all: _deps/matplotplusplus-build/source/3rd_party/CMakeFiles/nodesoup.dir/all
+CMakeFiles/sas_main.dir/all: _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/all
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/depend
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles --progress-num=49,50,51,52,53 "Built target sas_main"
+.PHONY : CMakeFiles/sas_main.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/sas_main.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles 48
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/sas_main.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles 0
+.PHONY : CMakeFiles/sas_main.dir/rule
+
+# Convenience name for target.
+sas_main: CMakeFiles/sas_main.dir/rule
+
+.PHONY : sas_main
+
+# clean rule for target.
+CMakeFiles/sas_main.dir/clean:
+	$(MAKE) -f CMakeFiles/sas_main.dir/build.make CMakeFiles/sas_main.dir/clean
+.PHONY : CMakeFiles/sas_main.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/main.dir
 
 # All Build rule for target.
-CMakeFiles/main.dir/all: _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/all
 CMakeFiles/main.dir/all: _deps/matplotplusplus-build/source/3rd_party/CMakeFiles/nodesoup.dir/all
+CMakeFiles/main.dir/all: _deps/matplotplusplus-build/source/matplot/CMakeFiles/matplot.dir/all
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target main"

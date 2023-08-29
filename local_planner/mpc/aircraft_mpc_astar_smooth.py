@@ -95,7 +95,7 @@ class AirplaneSimpleModelMPC(MPC.MPC):
         """add additional constraints to the MPC problem"""
         #add control constraints
         self.lbx['U'][0,:] = self.airplane_params['du_phi_min']
-        self.ubx['U'][0,:] = self.airpuavlane_params['du_phi_max']
+        self.ubx['U'][0,:] = self.airplane_params['du_phi_max']
 
         self.lbx['U'][1,:] = self.airplane_params['u_theta_min']
         self.ubx['U'][1,:] = self.airplane_params['u_theta_max']
@@ -280,18 +280,18 @@ if __name__ == "__main__":
         'u_theta_max': np.deg2rad(20),
         'z_min': 0.0,
         'z_max': 30.0,
-        'v_cmd_min': 10,
+        'v_cmd_min': 15,
         'v_cmd_max': 20,
         'theta_min': np.deg2rad(-10),
         'theta_max': np.deg2rad(10),
-        'phi_min': np.deg2rad(-60),
+        'phi_min': np.deg2rad(-60), 
         'phi_max': np.deg2rad(60),
         'du_phi_min': np.deg2rad(-45),
         'du_phi_max': np.deg2rad(45)
     }  
 
     Q = ca.diag([1.0, 1.0, 1.0, 0.75, 0.75, 0.75, 0.5])
-    R = ca.diag([2.0, 2.0, 1.0, 0.2])
+    R = ca.diag([2.0, 3.0, 1.0, 3.0])
 
     mpc_airplane = AirplaneSimpleModelMPC(
         model=airplane,
@@ -362,15 +362,16 @@ if __name__ == "__main__":
         theta_end = theta_wps[i]
         psi_end = psi_wps[i]
 
-        
         start = [x_start, y_start, z_start, phi_start, theta_start, psi_start, phi_u]
         goal =  [x_end,   y_end,   z_end,   phi_start, theta_start, psi_end, 0]
         if i == 1:
-            some_time, solution, obstacles = mpc_airplane.solve_mpc(start, goal, init_time, 10, True
-                                                                    , init_controls)
+            some_time, solution, obstacles = mpc_airplane.solve_mpc(start, goal, 
+                                                                    init_time, 10, 
+                                                                    True, init_controls)
         else:
-            some_time, solution, obstacles = mpc_airplane.solve_mpc(start, goal, 0, 10, True, 
-                                                                    init_controls)
+            some_time, solution, obstacles = mpc_airplane.solve_mpc(start, goal,
+                                                                     0, 10, 
+                                                                     True, init_controls)
         total_time.extend(some_time)
         solution_list.extend(solution)
         obstacle_history.extend(obstacles)
@@ -420,12 +421,17 @@ if __name__ == "__main__":
     ax1.plot(x_target, y_target, 'x')
     ax1.plot(x_wps, y_wps, 'o-', color='r')
 
-    if Config.MULTIPLE_OBSTACLE_AVOID:
-        for obstacle in Config.OBSTACLES:
-            circle = patches.Circle((obstacle[0], obstacle[1]), obstacle[2]/2, 
-                edgecolor='r', facecolor='none')
-            ax1.add_patch(circle)
+    obs_df = pd.read_csv('obstacles.csv')
+    obs_x = obs_df['x'].values
+    obs_y = obs_df['y'].values
+    obs_z = obs_df['z'].values
+    obs_radius = obs_df['radius'].values
 
+    for i in range(len(obs_x)):
+        circle = patches.Circle((obs_x[i], obs_y[i]), obs_radius[i]/2, 
+            edgecolor='r', facecolor='none')
+        ax1.add_patch(circle)
+    
 
     #%% plot 3d trajectory
     fig2 = plt.figure(figsize=(8,8))

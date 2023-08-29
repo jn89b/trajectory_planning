@@ -72,6 +72,18 @@ string
 vector
 -
 
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/Astar.cpp
+Astar.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/Astar.h
+doctest/doctest.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/doctest/doctest.h
+
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.cpp
+GridMap.h
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/src/GridMap.h
+math.h
+-
+
 _deps/matplotplusplus-build/source/matplot/matplot/detail/exports.h
 
 _deps/matplotplusplus-src/source/matplot/axes_objects/bars.h

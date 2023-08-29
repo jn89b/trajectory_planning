@@ -79,11 +79,111 @@ class Agent
         // return a list of possible moves in 2D
         std::vector<PositionVector> getMoves2D(PositionVector current_pos);
 
-
-
-
 };
 
+
+class FWAgent 
+{
+    private:
+        int x;
+        int y;
+        int z;
+        
+        int goal_x;
+        int goal_y;
+        int goal_z;
+
+        double agent_radius = 0.0f; // default value
+        PositionVector position = PositionVector(
+                                    x, y, z);
+        PositionVector goal_position = PositionVector(
+                                    goal_x, goal_y, goal_z);
+
+        float theta_dg;
+        float psi_dg;
+
+        float max_psi_turn_dg;
+        float leg_segment_m;
+
+    public:
+        // Constructor if you want set as position vectors
+        FWAgent(PositionVector pos, 
+            PositionVector goal_position, 
+            double agent_radius=0.0f, 
+            float theta_dg=0.0f, 
+            float psi_dg=0.0f, 
+            float max_psi_turn_dg=45.0f,
+            float leg_segment_m=10.0f) 
+            {
+                this->x = pos.x;
+                this->y = pos.y;
+                this->z = pos.z;
+                this->position = pos;
+                this->goal_position = goal_position;
+                this->agent_radius = agent_radius;
+                this->theta_dg = theta_dg;
+                this->psi_dg = psi_dg;
+                this->max_psi_turn_dg = max_psi_turn_dg;
+                this->leg_segment_m = leg_segment_m;
+            }
+        
+        // Constructor if you want set as individual doubles
+        FWAgent(int x, int y, int z, 
+            int goal_x, int goal_y, int goal_z, 
+            double agent_radius=0.0f, 
+            float theta_dg=0.0f,
+            float psi_dg=0.0f, 
+            float max_psi_turn_dg=45.0f,
+            float leg_segment_m=5.0f);
+        
+        void setMaxPsiTurnDg(float max_psi_turn_dg) 
+            {this->max_psi_turn_dg = max_psi_turn_dg;}
+        float getMaxPsiTurn(){return max_psi_turn_dg;}
+
+        void setLegSegmentm(float leg_segment_m) 
+            {this->leg_segment_m = leg_segment_m;}
+        float getLegSegmentm(){return leg_segment_m;}
+        
+        double getX() {return x;}
+        double getY() {return y;}
+        double getZ() {return z;}
+        
+        //setters and getters for radius of agent in meters
+        void setRadius(double radius) {agent_radius = radius;}
+        double getRadius() {return agent_radius;}
+
+        void setTheta(float theta) {theta_dg = theta;}
+        float getTheta() {return theta_dg;}
+
+        void setPsi(float psi) {psi_dg = psi;}
+        float getPsi() {return psi_dg;}
+        
+        //setter getters and update for position
+        PositionVector getPosition() {return position;}
+        void setPosition(PositionVector pos) {position = pos;}
+        void setPosition(double x, double y, double z) 
+            {position = PositionVector(x, y, z);}
+        void updatePosition(PositionVector new_pos) {position = new_pos;}
+        void updatePosition(double x, double y, double z) 
+            {position = PositionVector(x, y, z);}
+
+        //setter getters and update for goal position
+        void setGoalPosition(PositionVector goal_pos) 
+            {goal_position = goal_pos;}
+        void setGoalPosition(int x, int y, int z) 
+            {goal_position = PositionVector(x, y, z);}
+        PositionVector getGoalPosition() {return goal_position;}
+        void updateGoalPosition(PositionVector new_pos) 
+            {goal_position = new_pos;}
+        void updateGoalPosition(int x, int y, int z)
+            {goal_position = PositionVector(x, y, z);}
+
+        // return a vector of possible moves in 3D
+        std::vector<PositionVector> getMoves3D(
+            PositionVector current_pos, float curr_psi_dg,
+            int step_psi_dg=5);
+
+};
 
 /* -------------------------------------------------
     OBSTACLE CLASS
@@ -176,10 +276,7 @@ class GridMap
         int x_max;
         int y_max;
         int z_max;
-    
         std::vector<Obstacle*> obstacle_list;
-
-
 };
 
 

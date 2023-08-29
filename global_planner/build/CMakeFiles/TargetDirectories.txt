@@ -4,6 +4,7 @@
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles/list_install_components.dir
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles/rebuild_cache.dir
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles/edit_cache.dir
+/home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles/sas_main.dir
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/CMakeFiles/main.dir
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/_deps/matplotplusplus-build/CMakeFiles/install/strip.dir
 /home/justin/coding_projects/dstar_projects/trajectory_planning/global_planner/build/_deps/matplotplusplus-build/CMakeFiles/install/local.dir

@@ -293,18 +293,10 @@ if __name__ == "__main__":
     Q = ca.diag([1.0, 1.0, 1.0, 0.75, 0.75, 0.75, 0.5])
     R = ca.diag([2.0, 3.0, 1.0, 3.0])
 
-    mpc_airplane = AirplaneSimpleModelMPC(
-        model=airplane,
-        N=20,
-        dt_val=0.1,
-        Q=Q,
-        R=R,
-        airplane_params=airplane_params
-    )
 
     mpc_airplane = AirplaneSimpleModelMPC(
         model=airplane,
-        N=20,
+        N=10,
         dt_val=0.1,
         Q=Q,
         R=R,

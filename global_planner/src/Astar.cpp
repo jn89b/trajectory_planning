@@ -23,13 +23,6 @@ void FWNode::setDirectionVec()
         float mag_direction = sqrt((direction_vec.x * direction_vec.x) + 
             (direction_vec.y * direction_vec.y));
         
-
-        // float theta_rad = atan2(direction_vec.z, mag_direction); // should do this with eigen
-        // theta_dg = utils::rad2deg(theta_rad);
-        
-        // float psi_rad = atan2(direction_vec.y, direction_vec.x);
-        // psi_dg = utils::rad2deg(psi_rad);
-
     }
     else
     {
@@ -375,13 +368,13 @@ std::vector<PositionVector> SparseAstar::searchPath()
         float dist_goal = computeHeuristic(
             current_node->pos, agent_->getGoalPosition());
         
-        if (dist_goal <= agent_->getLegSegmentm())
-        {
-            printf("Closing in location%d \n", iter);
-            printf("Distance to goal is %0.1f \n", dist_goal);
-            path = getPath(current_node);
-            break;
-        }
+        // if (dist_goal <= agent_->getLegSegmentm())
+        // {
+        //     printf("Closing in location%d \n", iter);
+        //     printf("Distance to goal is %0.1f \n", dist_goal);
+        //     path = getPath(current_node);
+        //     break;
+        // }
 
         // Check time here 
 
@@ -553,13 +546,9 @@ PositionVector SparseAstar::index1DToPosition(int index)
     int idx =- (z * grid_map_->getGridSizeX() * grid_map_->getGridSizeY());
     int y = idx / grid_map_->getGridSizeX();
     int x = idx % grid_map_->getGridSizeX();
-
-    // int x = index % grid_map_->getGridSizeX();
-    // int y = (index / grid_map_->getGridSizeX()) % grid_map_->getGridSizeY();
-    // int z = (index / (grid_map_->getGridSizeX()) * grid_map_->getGridSizeY());
-
-    return PositionVector(x, y, z);
     
+    return PositionVector(x, y, z);    
+
 }
 
 // ----------------------------------------------------------------

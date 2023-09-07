@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 3.5)
 # Set the project name
 project (global_planner)
 
-
 # https://github.com/lava/matplotlib-cpp/issues/236
 # find python libraries
 find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
@@ -50,7 +49,6 @@ target_include_directories(sas_main
     PRIVATE 
         ${PROJECT_SOURCE_DIR}/include
 )
-
 
 target_link_libraries(main PUBLIC matplot)
 target_link_libraries(sas_main PUBLIC matplot)

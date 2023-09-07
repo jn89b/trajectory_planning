@@ -217,7 +217,6 @@ class Astar
 
 class SparseAstar
 {
-	
     public:
         // Constructor for the Astar class
         // Must have a GridMap and an Agent to begin

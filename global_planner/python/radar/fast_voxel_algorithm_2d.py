@@ -34,11 +34,11 @@ radar_pos = PositionVector(radar_x, radar_y)
 
 #we have radar azmith angle
 azmith_angle_rad = np.deg2rad(30)
-max_fov_rad = np.deg2rad(45)
+max_fov_rad = np.deg2rad(80)
 
 # we queries our obstacles and get one 
-obstacle_x = 10
-obstacle_y = 10
+obstacle_x = 15
+obstacle_y = 15
 radius_obstacle_m = 3
 obs_pos = PositionVector(obstacle_x, obstacle_y)
 
@@ -47,19 +47,18 @@ obs_pos = PositionVector(obstacle_x, obstacle_y)
 # r = u + tv where u = origin point, convert to numpy to ma  
 r_dist = np.linalg.norm(radar_pos.vec - obs_pos.vec)
 
-
 #vector to center of radar to obs 
 r_radar_to_obs = (obs_pos.vec - radar_pos.vec) 
 
 #compute the position on the outside of the circle from the radar
-r_outs_x = obstacle_x - r_dist*np.cos(azmith_angle_rad)
-r_outs_y = obstacle_y - r_dist*np.sin(azmith_angle_rad)
+r_outs_x = obstacle_x - radius_obstacle_m*np.cos(azmith_angle_rad)
+r_outs_y = obstacle_y - radius_obstacle_m*np.sin(azmith_angle_rad)
 
-r_north_x = obstacle_x - r_dist*np.cos(azmith_angle_rad + max_fov_rad/2)
-r_north_y = obstacle_y - r_dist*np.sin(azmith_angle_rad + max_fov_rad/2)
+r_north_x = obstacle_x - radius_obstacle_m*np.cos(azmith_angle_rad + max_fov_rad/2)
+r_north_y = obstacle_y - radius_obstacle_m*np.sin(azmith_angle_rad + max_fov_rad/2)
 
-r_south_x = obstacle_x - r_dist*np.cos(azmith_angle_rad - max_fov_rad/2)
-r_south_y = obstacle_y - r_dist*np.sin(azmith_angle_rad - max_fov_rad/2)
+r_south_x = obstacle_x - radius_obstacle_m*np.cos(azmith_angle_rad - max_fov_rad/2)
+r_south_y = obstacle_y - radius_obstacle_m*np.sin(azmith_angle_rad - max_fov_rad/2)
 
 # --------- begin fast voxel algorithm right here 2d for now ----------------------
 # x0 = radar_x

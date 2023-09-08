@@ -178,7 +178,7 @@ outside_obs = plt.Circle((r_outs_x, r_outs_y), 1,
                     color='black', fill=False)
 
 for square in cell_rays:
-    square = plt.Rectangle(square, 1, 1, color='blue', fill=True)
+    square = plt.Rectangle(square, 1, 1, color='red', fill=True)
     axis.add_artist(square)
 
 center_x = [center_rays[i][0] for i in range(len(center_rays))]

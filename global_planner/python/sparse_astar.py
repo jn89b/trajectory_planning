@@ -124,7 +124,6 @@ class Radar():
         return None
 
 
-
 class FWAgent():
     def __init__(self, position:PositionVector, 
                  theta_dg:float=0, psi_dg:float=0, leg_m:float=50) -> None:

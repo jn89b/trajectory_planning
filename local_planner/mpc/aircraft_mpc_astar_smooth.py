@@ -440,22 +440,22 @@ if __name__ == "__main__":
     ax2.plot(x_wps, y_wps, z_wps, 'o-', color='r')
 
     #plot obstacles as cylinders
-    if Config.MULTIPLE_OBSTACLE_AVOID:
-        for obstacle in Config.OBSTACLES:
-            x = obstacle[0]
-            y = obstacle[1]
-            z = 0
-            radius = Config.OBSTACLE_DIAMETER/2
-            height = z_upp - z_min
-            n_space = 10
+    # if Config.MULTIPLE_OBSTACLE_AVOID:
+    #     for obstacle in Config.OBSTACLES:
+    #         x = obstacle[0]
+    #         y = obstacle[1]
+    #         z = 0
+    #         radius = Config.OBSTACLE_DIAMETER/2
+    #         height = z_upp - z_min
+    #         n_space = 10
 
-            ax2.plot_surface(
-                x + radius * np.outer(np.cos(np.linspace(0, 2 * np.pi, n_space)), np.ones(n_space)),
-                y + radius * np.outer(np.sin(np.linspace(0, 2 * np.pi, n_space)), np.ones(n_space)),
-                z + height * np.outer(np.ones(n_space), np.linspace(0, 1, n_space)),
-                color='g',
-                alpha=0.2
-            )
+    #         ax2.plot_surface(
+    #             x + radius * np.outer(np.cos(np.linspace(0, 2 * np.pi, n_space)), np.ones(n_space)),
+    #             y + radius * np.outer(np.sin(np.linspace(0, 2 * np.pi, n_space)), np.ones(n_space)),
+    #             z + height * np.outer(np.ones(n_space), np.linspace(0, 1, n_space)),
+    #             color='g',
+    #             alpha=0.2
+    #         )
 
     ax2.set_zlim(z_min, z_upp)
     #set plot to equal aspect ratio

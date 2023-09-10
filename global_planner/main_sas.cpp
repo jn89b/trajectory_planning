@@ -38,7 +38,7 @@ int main()
 
     //set seed for random number generator
     srand(2);
-    int n_obstacles = 150;
+    int n_obstacles = 250;
     // insert 20 random obstacles
     for (int i = 0; i< n_obstacles; i++)
     {

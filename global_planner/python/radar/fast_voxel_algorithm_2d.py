@@ -52,13 +52,13 @@ max_bound_z = 100
 # implementation of the fast voxel algorithm
 #assume we have radar point somewhere
 radar_x = 5
-radar_y = 5
+radar_y = 0
 radar_pos = PositionVector(radar_x, radar_y)
 
 #we have radar azmith angle
-azmith_angle_rad = np.deg2rad(30)
+azmith_angle_rad = np.deg2rad(0)
 max_fov_rad = np.deg2rad(90)
-radar_range_m = 30 
+radar_range_m = 15 
 
 # we queries our obstacles and get one 
 obstacle_x = 10
@@ -169,12 +169,65 @@ r_south_y = obstacle_y + radius_obstacle_m*np.sin(south_los_rad)
 #     print(n)
 
 
+def fast_voxel_algo3D(x0:float, y0:float, z0:float, 
+                      x1:float, y1:float, z1:float, 
+                      obs_list=[]) ->list:
+    
+    dx = abs(x1 - x0)
+    dy = abs(y1 - y0)
+    dz = abs(z1 - z0)
+
+    x = int(np.floor(x0))
+    y = int(np.floor(y0))
+    z = int(np.floor(z0))
+
+    dt_dx = 1/ dx
+    dt_dy = 1/ dy
+    dt_dz = 1/ dz
+
+    t = 0
+    n = 1 
+    t_next_horizontal = 0
+    t_next_vertical = 0
+
+    if (dx == 0):
+        x_inc = 0
+        t_next_horizontal = dt_dx 
+    elif (x1 > x0):
+        x_inc = 1
+        n += int(np.floor(x1)) - x
+        t_next_horizontal = (np.floor(x0) + 1 - x0) * dt_dx
+    else:
+        x_inc = -1
+        n += x - int(np.floor(x1))
+        t_next_horizontal = (x0 - np.floor(x0)) * dt_dx
+
+    if (dy == 0):
+        y_inc = 0
+        t_next_vertical = dt_dy 
+    elif (y1 > y0):
+        y_inc = 1
+        n += int(np.floor(y1)) - y
+        t_next_vertical = (np.floor(y0) + 1 - y0) * dt_dy
+    else:
+        y_inc = -1
+        n += x - int(np.floor(y1))
+        t_next_vertical = (y0 - np.floor(y0)) * dt_dy
+
+
+    
+    
+
 def fast_voxel_algo(x0:int, y0:int, x1:int, y1:int, obs_list=[]) -> list:
     """this uses integer math"""
     dx = int(abs(x1 - x0))
     dy = int(abs(y1 - y0))
+    #dz = int(abs(z1 - z0))
+
     x = int(np.floor(x0))
     y = int(np.floor(y0))
+    #z = int(np.floor(z0))
+
     n = int(1 + dx + dy)
     if (x1 > x0):
         x_inc = 1
@@ -186,11 +239,16 @@ def fast_voxel_algo(x0:int, y0:int, x1:int, y1:int, obs_list=[]) -> list:
     else:
         y_inc = -1
 
-
-    error = dx - dy
+    if (z1 > z0):
+        z_inc = 1
+    else:
+        z_inc = -1    
+        
+    error = dx - dy - dz
 
     dx *= 2
     dy *= 2
+    dz *= 2
 
     cell_rays = []
     for i in range(n):

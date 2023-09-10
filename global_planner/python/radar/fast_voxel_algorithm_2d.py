@@ -12,6 +12,8 @@ https://www.redblobgames.com/articles/visibility/
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D 
+
 
 class PositionVector():
     def __init__(self, x:float, y:float, z:float=0) -> None:
@@ -51,14 +53,14 @@ max_bound_z = 100
 
 # implementation of the fast voxel algorithm
 #assume we have radar point somewhere
-radar_x = 5
+radar_x = 0
 radar_y = 0
 radar_pos = PositionVector(radar_x, radar_y)
 
 #we have radar azmith angle
 azmith_angle_rad = np.deg2rad(0)
 max_fov_rad = np.deg2rad(90)
-radar_range_m = 15 
+radar_range_m = 5
 
 # we queries our obstacles and get one 
 obstacle_x = 10
@@ -189,6 +191,7 @@ def fast_voxel_algo3D(x0:float, y0:float, z0:float,
     n = 1 
     t_next_horizontal = 0
     t_next_vertical = 0
+    t_next_height = 0
 
     if (dx == 0):
         x_inc = 0
@@ -211,12 +214,59 @@ def fast_voxel_algo3D(x0:float, y0:float, z0:float,
         t_next_vertical = (np.floor(y0) + 1 - y0) * dt_dy
     else:
         y_inc = -1
-        n += x - int(np.floor(y1))
+        n += y - int(np.floor(y1))
         t_next_vertical = (y0 - np.floor(y0)) * dt_dy
 
+    if (dz == 0):
+        z_inc = 0
+        t_next_height = dt_dz 
+    elif (z1 > z0):
+        z_inc = 1
+        n += int(np.floor(z1)) - z
+        t_next_height = (np.floor(z0) + 1 - z0) * dt_dz
+    else:
+        z_inc = -1
+        n += z - int(np.floor(z1))
+        t_next_height = (z0 - np.floor(z0)) * dt_dz
 
-    
-    
+    error = dx - dy #- dz
+
+    cell_rays = []
+    for i in range(n):
+        print(x,y,z)
+        
+        # if obs_list:
+        #     for obs in obs_list:
+        #         pos = PositionVector(x,y)
+        #         if obs.is_inside2D(pos,0.0) == True:
+        #             return cell_rays
+
+        cell_rays.append((x,y,z))
+        # dy < dx then I need to go up since 
+        if (t_next_horizontal < t_next_vertical):
+            if (t_next_horizontal < t_next_height):
+                x += x_inc
+                t = t_next_horizontal
+                t_next_horizontal += dt_dx
+            else:
+                z += z_inc
+                t = t_next_height
+                t_next_height += dt_dz
+        else:
+            if (t_next_vertical < t_next_height):
+                y += y_inc
+                t = t_next_vertical
+                t_next_vertical += dt_dz
+            else:
+                z += z_inc
+                t = t_next_height
+                t_next_height += dt_dz
+            
+        # print(n)
+
+    return cell_rays
+
+
 
 def fast_voxel_algo(x0:int, y0:int, x1:int, y1:int, obs_list=[]) -> list:
     """this uses integer math"""
@@ -238,17 +288,12 @@ def fast_voxel_algo(x0:int, y0:int, x1:int, y1:int, obs_list=[]) -> list:
         y_inc = 1
     else:
         y_inc = -1
-
-    if (z1 > z0):
-        z_inc = 1
-    else:
-        z_inc = -1    
         
-    error = dx - dy - dz
+    error = dx - dy #- dz
 
     dx *= 2
     dy *= 2
-    dz *= 2
+    #dz *= 2
 
     cell_rays = []
     for i in range(n):
@@ -358,8 +403,45 @@ axis.add_artist(obs)
 axis.add_artist(outside_obs)
 axis.legend()
 plt.tight_layout()
+# plt.show()
+
+
+
+#### Testing 3D voxel
+# def fast_voxel_algo3D(x0:float, y0:float, z0:float, 
+#                       x1:float, y1:float, z1:float, 
+#                       obs_list=[]) ->list:
+
+center_rays_3D = fast_voxel_algo3D(radar_x, 
+                                   radar_y, 
+                                   1, 
+                                   10, 
+                                   10, 
+                                   10)
+
+# Determine the dimensions of the grid based on the maximum coordinates
+max_coords = np.max(center_rays_3D, axis=0)
+grid_shape = tuple(coord + 1 for coord in max_coords)
+
+# Create a 3D array to represent the voxel grid
+voxel_grid = np.zeros(grid_shape)
+
+# Set the voxel values to 1 for the specified coordinates
+for coord in center_rays_3D:
+    voxel_grid[coord] = 1
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter3D(radar_pos.x, radar_pos.y, radar_pos.z , s=100, label='radar')
+ax.scatter3D(10, 10, 10 , s=100, c='k', label='random point')
+# Use the `voxels` function to plot the voxel grid
+ax.voxels(voxel_grid, facecolors=[1,0,0,0.3], edgecolor='k')
+
+# Set axis labels
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+
+ax.legend()
 plt.show()
-
-
-
-

@@ -8,6 +8,13 @@ https://github.com/cgyurgyik/fast-voxel-traversal-algorithm
 http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
 
 https://www.redblobgames.com/articles/visibility/
+
+
+To do:
+- Ray trace with obstacles in 2D and 3D
+- Ray trace with multiple obstacles in 2D and 3D
+- 
+
 """
 
 import numpy as np
@@ -58,9 +65,9 @@ radar_y = 0
 radar_pos = PositionVector(radar_x, radar_y)
 
 #we have radar azmith angle
-azmith_angle_rad = np.deg2rad(0)
+azmith_angle_rad = np.deg2rad(45)
 max_fov_rad = np.deg2rad(90)
-radar_range_m = 5
+radar_range_m = 15
 
 # we queries our obstacles and get one 
 obstacle_x = 10
@@ -88,7 +95,7 @@ fov_south = PositionVector(
 #compute north and south side angle
 los_angle_rad = np.arctan2(obs_pos.y - radar_pos.y,
                            obs_pos.x - radar_pos.x)
-
+import numpy as np
 north_los_rad = los_angle_rad + np.pi/2
 south_los_rad = los_angle_rad - np.pi/2
 
@@ -229,8 +236,6 @@ def fast_voxel_algo3D(x0:float, y0:float, z0:float,
         n += z - int(np.floor(z1))
         t_next_height = (z0 - np.floor(z0)) * dt_dz
 
-    error = dx - dy #- dz
-
     cell_rays = []
     for i in range(n):
         print(x,y,z)
@@ -265,7 +270,6 @@ def fast_voxel_algo3D(x0:float, y0:float, z0:float,
         # print(n)
 
     return cell_rays
-
 
 
 def fast_voxel_algo(x0:int, y0:int, x1:int, y1:int, obs_list=[]) -> list:
@@ -403,7 +407,7 @@ axis.add_artist(obs)
 axis.add_artist(outside_obs)
 axis.legend()
 plt.tight_layout()
-# plt.show()
+plt.show()
 
 
 
@@ -414,7 +418,7 @@ plt.tight_layout()
 
 center_rays_3D = fast_voxel_algo3D(radar_x, 
                                    radar_y, 
-                                   1, 
+                                   0, 
                                    10, 
                                    10, 
                                    10)

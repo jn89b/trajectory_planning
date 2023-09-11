@@ -38,9 +38,9 @@ if __name__ == '__main__':
     radar_params = {
         'pos': radar_pos,
         'azimuth_angle_dg': 45,
-        'elevation_angle_dg': 45, #this is wrt to z axis
+        'elevation_angle_dg': 30, #this is wrt to z axis
         'radar_range_m': 40,
-        'max_fov_dg': 60,
+        'max_fov_dg': 75,
         # 'max_vert_fov_dg': 5,
         'c1': -0.3,
         'c2': 1200
@@ -52,7 +52,6 @@ if __name__ == '__main__':
 
     radar_example = Radar(radar_params)
     
-
     """to do"""
     # set obstacles, update this to feed in list of obstacles 
     # from the map, grab the ones within the radar fov and then 
@@ -91,7 +90,6 @@ if __name__ == '__main__':
             )
         )
     )
-
 
     marker_data = go.Scatter3d(
         x=max_x_data, 

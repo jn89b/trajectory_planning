@@ -296,9 +296,21 @@ class Grid():
         """
         Check if position is in obstacle
         """
-        for obstacle in self.obstacles:
-            if obstacle.is_inside2D(position, self.agent.radius_m):
+        for obs in self.obstacles:
+            if obs.is_inside2D(position, self.agent.radius_m):
                 return True
+
+    def position_to_index1D(self, position:PositionVector) -> int:
+        """returns 1D index of position"""
+
+        if position.z == 0:
+            return int((position.x/self.sx) + (position.y/self.sy) * 
+                    (self.x_max_m/self.sx))
+        else:
+            index = position.x + (position.y * self.x_max_m) + \
+                (position.z * self.sx * self.sy)
+            return int(index)
+        
 
 class HighLevelAstar():
     def __init__(self, grid:Grid) -> None:        

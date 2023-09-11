@@ -27,12 +27,14 @@ class Radar():
         self.azmith_angle_rad = np.deg2rad(self.azmith_angle_dg)
         self.elevation_angle_rad = np.deg2rad(self.elevation_angle_dg)
 
+        self.c1 = radar_params['c1']
+        self.c2 = radar_params['c2']
+
         self.compute_lat_max_fov()
         self.compute_vert_max_fox()
 
         self.detection_voxels = []
         self.detection_positions = []
-
 
     def compute_lat_max_fov(self):
         """computes the lateral bounds of the radar fov"""
@@ -123,10 +125,6 @@ class Radar():
 
         azmith_bearing_dgs = np.arange(min_lat_dg, max_lat_dg+1)
         elevation_bearing_dgs = np.arange(min_vert_dg, max_vert_dg+1)
-        print("min azmith", min_lat_dg)
-        print("max azmith", max_lat_dg)
-        print("min elevation", min_vert_dg)
-        print("max elevation", max_vert_dg)
 
         for bearing in azmith_bearing_dgs:
             for elevation in elevation_bearing_dgs:
@@ -157,10 +155,12 @@ class Radar():
         return self.detection_voxels
 
 
-    def compute_preliminary_prob_inst_detect(self) -> float:
-        """computes the preliminary probability of 
-        instantaneous detection without consideration of RCS"""
-
+    def compute_preliminary_prob_inst_detect(self, dist:float) -> float:
+        """
+        computes the preliminary probability of 
+        instantaneous detection without consideration of RCS
+        """
+        return 1/(self.c2*dist**4)**self.c1
 
 
 

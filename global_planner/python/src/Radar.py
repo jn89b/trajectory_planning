@@ -100,6 +100,7 @@ class Radar():
 
     def compute_fov_cells_3d(self, obs_list=[]) -> list:
         """returns """
+        print("obs list", obs_list)
         lat_fov_upp_dg = np.rad2deg(self.lat_fov_upp_rad)
         lat_fov_low_dg = np.rad2deg(self.lat_fov_low_rad)
 

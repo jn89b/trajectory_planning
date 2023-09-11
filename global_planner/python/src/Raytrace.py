@@ -183,7 +183,6 @@ def another_fast_voxel(x0:float, y0:float, z0:float,
     elif direction_x > 0:
         step_x = 1
         t_delta_x = step_x / direction_x
-        prev_x_index = current_x_index - 1
         t_max_x = (min_x_bound + current_x_index - x0) / direction_x
     else:
         step_x = 0
@@ -197,7 +196,6 @@ def another_fast_voxel(x0:float, y0:float, z0:float,
     elif direction_y > 0:
         step_y = 1
         t_delta_y = step_y / direction_y
-        prev_y_index = current_y_index - 1
         t_max_y = (min_y_bound + current_y_index - y0) / direction_y
     else:
         step_y = 0
@@ -211,7 +209,6 @@ def another_fast_voxel(x0:float, y0:float, z0:float,
     elif direction_z > 0:
         step_z = 1
         t_delta_z = step_z / direction_z
-        prev_z_index = current_z_index - 1
         t_max_z = (min_z_bound + current_z_index - z0) / direction_z
     else:
         step_z = 0
@@ -223,6 +220,14 @@ def another_fast_voxel(x0:float, y0:float, z0:float,
     while (current_x_index != end_x_index or \
            current_y_index != end_y_index or \
            current_z_index != end_z_index):
+
+        # if obs_list:
+        for obs in obs_list:
+            pos = PositionVector(current_x_index,current_y_index)
+            if obs.is_inside2D(pos,0.0) == True:
+                print("obs found")
+                return rays_3D
+                break
 
         if t_max_x < t_max_y:
             if t_max_x < t_max_z:

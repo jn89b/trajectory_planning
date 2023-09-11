@@ -1,41 +1,39 @@
-import matplotlib.pyplot as plt
 import numpy as np
+import plotly.graph_objects as go
 
-# Define the dimensions of your voxel grid
-x_dim = 10  # Number of voxels in the x-direction
-y_dim = 10  # Number of voxels in the y-direction
-z_dim = 10  # Number of voxels in the z-direction
+def cylinder(x, y, z, r, dz):
+    """Create a cylindrical mesh located at x, y, z, with radius r and height dz"""
+    center_z = np.linspace(0, dz, 15)
+    theta = np.linspace(0, 2*np.pi, 15)
+    theta_grid, z_grid = np.meshgrid(theta, center_z)
+    x_grid = r * np.cos(theta_grid) + x
+    y_grid = r * np.sin(theta_grid) + y
+    z_grid = z_grid + z
+    return x_grid, y_grid, z_grid
 
-# Create a 3D NumPy array representing the voxel data
-# In this example, we create a 3x3x3 grid with some voxels turned on (1) and others off (0)
-voxel_data = np.zeros((x_dim, y_dim, z_dim))
+def circle(x, y, z, r):
+    """Create a circular mesh located at x, y, z with radius r"""
+    r_discr = np.linspace(0, r, 2)
+    theta_discr = np.linspace(0, 2*np.pi, 15)
+    r_grid, theta_grid = np.meshgrid(r_discr, theta_discr)
+    x_circle = r_grid * np.cos(theta_grid) + x
+    y_circle = r_grid * np.sin(theta_grid) + y
+    z_circle = np.zeros_like(x_circle) + z
+    return x_circle, y_circle, z_circle
 
-# List of coordinates (including positive and negative coordinates)
-coordinates = [(2, 2, 2), (-3, -3, -3), (-1, 1, 1), (3, -2, 2)]
+# cylinder mesh
+x_cyl, y_cyl, z_cyl = cylinder(0, 0, 0, 2, 8)
+# bottom cap
+x_circle1, y_circle1, z_circle1 = circle(0, 0, 0, 2)
+# top cap
+x_circle2, y_circle2, z_circle2 = circle(0, 0, 8, 2)
 
-# Translate coordinates into indices within the voxel_data array
-for coord in coordinates:
-    x, y, z = coord
-    x_index = x + (x_dim // 2)  # Translate negative x to array index
-    y_index = y + (y_dim // 2)  # Translate negative y to array index
-    z_index = z + (z_dim // 2)  # Translate negative z to array index
-    voxel_data[x_index, y_index, z_index] = 1
+colorscale = [[0, '#636EFA'],
+             [1, '#636EFA']]
 
-# Create a figure and a 3D axis
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Use the voxels function to create the voxel plot
-ax.voxels(
-    voxel_data,
-    facecolors='b',  # Color for active (1) voxels
-    edgecolor='k'    # Color for voxel edges
-)
-
-# Set axis labels
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Show the plot
-plt.show()
+fig = go.Figure([
+    go.Surface(x=x_cyl, y=y_cyl, z=z_cyl, colorscale=colorscale, showscale=False, opacity=0.5),
+    go.Surface(x=x_circle1, y=y_circle1, z=z_circle1, showscale=False, opacity=0.5),
+    go.Surface(x=x_circle2, y=y_circle2, z=z_circle2, showscale=False, opacity=0.5),
+])
+fig.show()

@@ -7,7 +7,7 @@ class Obstacle():
         self.position = position
         self.radius_m = radius_m
 
-    def is_inside2D(self, position:PositionVector, agent_radius:float) -> bool:
+    def is_inside2D(self, position:PositionVector, agent_radius:float=0.0) -> bool:
         """
         Check if position is inside obstacle
         """
@@ -15,8 +15,9 @@ class Obstacle():
 
         dist = np.sqrt((position.x - self.position.x)**2 +
                           (position.y - self.position.y)**2)
-        
         if dist <= total_radius:
+            print("dist", dist, position.x, position.y)
+
             return True
         
         return False

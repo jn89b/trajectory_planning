@@ -497,7 +497,7 @@ def get_diff_paths(agent:FWAgent, horizon_min_radius_m:float,
     obstacle = Obstacle(obstacle_position, 50)
     grid.insert_obstacles(obstacle)
 
-    n_obstacles = 150
+    n_obstacles = 30
     #set seed 
     rand.seed(seed_num)
     for i in range(n_obstacles):
@@ -570,7 +570,7 @@ if __name__ == '__main__':
     
     
     goal = PositionVector()
-    goal.set_position(750,750,25)
+    goal.set_position(150,150,25)
     fw_agent.set_goal_state(goal)
 
     aircraft_speeds_ms = [15]
@@ -592,11 +592,11 @@ if __name__ == '__main__':
     fig4 = plt.figure()
     ax4 = fig4.add_subplot(111)
     for speed,wp_path in zip(aircraft_speeds_ms,wp_paths):
-        # if wp_path is None:
-        #     continue
-        
-        if len(wp_path) == 2:
+        if wp_path is None:
             continue
+        
+        # if len(wp_path) == 2:
+        #     continue
 
         x_path = [wp[0] for wp in wp_path]
         y_path = [wp[1] for wp in wp_path]

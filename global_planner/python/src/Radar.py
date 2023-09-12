@@ -9,7 +9,8 @@ from src.Raytrace import fast_voxel_algo, fast_voxel_algo3D, another_fast_voxel
 
 
 class Radar():
-    def __init__(self, radar_params:dict) -> None:
+    def __init__(self, 
+                 radar_params:dict) -> None:
         
         #check if all params are present
         for key in radar_params.keys():
@@ -24,6 +25,9 @@ class Radar():
         self.max_fov_dg = radar_params['max_fov_dg']
         self.max_fov_rad = np.deg2rad(self.max_fov_dg)
 
+        self.vert_max_fov_dg = radar_params['vert_max_fov_dg']
+        self.vert_max_fov_rad = np.deg2rad(self.vert_max_fov_dg)
+
         self.azmith_angle_rad = np.deg2rad(self.azmith_angle_dg)
         self.elevation_angle_rad = np.deg2rad(self.elevation_angle_dg)
 
@@ -33,8 +37,9 @@ class Radar():
         self.compute_lat_max_fov()
         self.compute_vert_max_fox()
 
-        self.detection_voxels = []
-        self.detection_positions = []
+        self.grid = radar_params['grid']
+
+        self.detection_info = {}
 
     def compute_lat_max_fov(self):
         """computes the lateral bounds of the radar fov"""
@@ -54,19 +59,19 @@ class Radar():
     def compute_vert_max_fox(self):
         """computes the vertical bounds of the radar fov"""
         self.vert_fov_upp_pos = PositionVector(
-            self.pos.x + self.radar_range_m*np.cos(self.elevation_angle_rad+(self.max_fov_rad/2)),
-            self.pos.y + self.radar_range_m*np.sin(self.elevation_angle_rad+(self.max_fov_rad/2)),
-            self.pos.z + self.radar_range_m*np.cos(self.elevation_angle_rad+(self.max_fov_rad/2))
+            self.pos.x + self.radar_range_m*np.cos(self.elevation_angle_rad+(self.vert_max_fov_rad/2)),
+            self.pos.y + self.radar_range_m*np.sin(self.elevation_angle_rad+(self.vert_max_fov_rad/2)),
+            self.pos.z + self.radar_range_m*np.cos(self.elevation_angle_rad+(self.vert_max_fov_rad/2))
         )
 
         self.vert_fov_low_pos = PositionVector(
-            self.pos.x + self.radar_range_m*np.cos(self.elevation_angle_rad-(self.max_fov_rad/2)),
-            self.pos.y + self.radar_range_m*np.sin(self.elevation_angle_rad-(self.max_fov_rad/2)),
-            self.pos.z + self.radar_range_m*np.cos(self.elevation_angle_rad-(self.max_fov_rad/2))
+            self.pos.x + self.radar_range_m*np.cos(self.elevation_angle_rad-(self.vert_max_fov_rad/2)),
+            self.pos.y + self.radar_range_m*np.sin(self.elevation_angle_rad-(self.vert_max_fov_rad/2)),
+            self.pos.z + self.radar_range_m*np.cos(self.elevation_angle_rad-(self.vert_max_fov_rad/2))
         )
 
-        self.vert_fov_upp_rad = self.elevation_angle_rad + (self.max_fov_rad/2)
-        self.vert_fov_low_rad = self.elevation_angle_rad - (self.max_fov_rad/2)
+        self.vert_fov_upp_rad = self.elevation_angle_rad + (self.vert_max_fov_rad/2)
+        self.vert_fov_low_rad = self.elevation_angle_rad - (self.vert_max_fov_rad/2)
 
     def get_obs_within_fov(self) -> list:
         """returns obstacles within fov"""
@@ -102,7 +107,6 @@ class Radar():
 
     def compute_fov_cells_3d(self, obs_list=[]) -> list:
         """returns """
-        print("obs list", obs_list)
         lat_fov_upp_dg = np.rad2deg(self.lat_fov_upp_rad)
         lat_fov_low_dg = np.rad2deg(self.lat_fov_low_rad)
 
@@ -123,9 +127,13 @@ class Radar():
             max_vert_dg = vert_fov_upp_dg
             min_vert_dg = vert_fov_low_dg
 
+        print("max lat dg", max_lat_dg)
+        print("min lat dg", min_lat_dg)
+
         azmith_bearing_dgs = np.arange(min_lat_dg, max_lat_dg+1)
         elevation_bearing_dgs = np.arange(min_vert_dg, max_vert_dg+1)
 
+        max_radar_val = 0
         for bearing in azmith_bearing_dgs:
             for elevation in elevation_bearing_dgs:
 
@@ -141,18 +149,31 @@ class Radar():
                 r_max_x = round(r_max_x)
                 r_max_y = round(r_max_y)
                 r_max_z = round(r_max_z)
-
-                self.detection_positions.append((r_max_x, r_max_y, r_max_z))
                 
                 bearing_rays = another_fast_voxel(self.pos.x , self.pos.y, self.pos.z,
                                             r_max_x, r_max_y, r_max_z, obs_list)
                 
-                self.detection_voxels.extend(bearing_rays)
+                for br in bearing_rays:
+                    pos = PositionVector(int(br[0]), int(br[1]), int(br[2]))
+                    pos_idx = self.grid.convert_position_to_index(pos)
+                    if pos_idx not in self.detection_info:
+                        dist = np.linalg.norm(pos.vec - self.pos.vec)
+                        detect_val = self.compute_preliminary_prob_inst_detect(dist)
+                        self.detection_info[pos_idx] = (detect_val, pos)
+                        if detect_val > max_radar_val:
+                            max_radar_val = detect_val
 
-        print(len(azmith_bearing_dgs)*len(elevation_bearing_dgs))
-        print("total length" , len(self.detection_voxels))
+                # self.detection_voxels.extend(bearing_rays)
 
-        return self.detection_voxels
+        #normalize radar values
+        for k,v in self.detection_info.items():
+            self.detection_info[k] = (v[0]/max_radar_val, v[1])
+
+        #print size of detection info
+        print("size of detection info", len(self.detection_info))
+        # print(len(azmith_bearing_dgs)*len(elevation_bearing_dgs))
+
+        return self.detection_info
 
 
     def compute_preliminary_prob_inst_detect(self, dist:float) -> float:
@@ -160,9 +181,8 @@ class Radar():
         computes the preliminary probability of 
         instantaneous detection without consideration of RCS
         """
-        return 1/(self.c2*dist**4)**self.c1
-
-
+        # return 1/(1 +(self.c2*dist**4)**self.c1)
+        return 1 - (dist/self.radar_range_m)
 
 if __name__ == "__main__":
     pass

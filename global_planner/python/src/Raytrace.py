@@ -225,9 +225,8 @@ def another_fast_voxel(x0:float, y0:float, z0:float,
         for obs in obs_list:
             pos = PositionVector(current_x_index,current_y_index)
             if obs.is_inside2D(pos,0.0) == True:
-                print("obs found")
                 return rays_3D
-                break
+
 
         if t_max_x < t_max_y:
             if t_max_x < t_max_z:

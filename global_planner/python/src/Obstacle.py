@@ -16,8 +16,6 @@ class Obstacle():
         dist = np.sqrt((position.x - self.position.x)**2 +
                           (position.y - self.position.y)**2)
         if dist <= total_radius:
-            print("dist", dist, position.x, position.y)
-
             return True
         
         return False

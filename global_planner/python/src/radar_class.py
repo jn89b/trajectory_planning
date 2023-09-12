@@ -133,6 +133,7 @@ if __name__=='__main__':
 
     # compute()
     changing_c1()
+    plt.show()
     # changing_rcs()
     
 

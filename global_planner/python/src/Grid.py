@@ -10,7 +10,7 @@ class FWAgent():
         self.position = position
         self.theta_dg = theta_dg #pitch anglemoves.append([next_x, next_y, next_z])
         self.psi_dg = psi_dg # this is azmith heading
-        self.radius_m = 10 #radius of aircraft meters
+        self.radius_m = 5 #radius of aircraft meters
         self.leg_m = leg_m #leg length in meters
 
     def set_current_state(self, position:PositionVector, 
@@ -146,7 +146,7 @@ class Grid():
         else:
             z_round = self.sz * m.floor(position.z/self.sz)
         
-        rounded_position = PositionVector()
+        rounded_position = PositionVector(x_round, y_round, z_round)
         rounded_position.set_position(x_round, y_round, z_round)
         return rounded_position
 
@@ -162,9 +162,9 @@ class Grid():
         # self.sy = self.sx
         # self.sz = m.ceil(self.sx * 
         #                 np.tan(np.deg2rad(self.agent.max_climb_angle_dg)))
-        self.sx = abs(self.x_max_m - self.x_min_m)
-        self.sy = abs(self.y_max_m - self.y_min_m)
-        self.sz = abs(self.z_max_m - self.z_min_m)
+        self.sx = self.x_max_m - self.x_min_m
+        self.sy = self.y_max_m - self.y_min_m
+        self.sz = self.z_max_m - self.z_min_m
 
 
     def is_out_bounds(self, position:PositionVector) -> bool:
@@ -190,8 +190,6 @@ class Grid():
 
     def convert_position_to_index(self, position:PositionVector) -> int:
         """returns 1D index of position"""
-        # return int(position.x + position.y * self.sx + position.z * 
-        #            self.sx * self.sy)
         if position.z == 0:
             return int(position.x + position.y * self.sx)
         else:
@@ -201,11 +199,6 @@ class Grid():
         
     def convert_index_to_position(self, index:int) -> PositionVector:
         """returns position from 1D index"""
-    
-        # z = int(index / (self.sx * self.sy))
-        # remaining_idx = index & (self.sx * self.sy)
-        # y = int(remaining_idx / self.sx)
-        # x = int(remaining_idx % self.sx)
 
         x = index % self.sx 
         index /= self.sx 

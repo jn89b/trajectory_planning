@@ -48,8 +48,6 @@ class Obstacle():
         
         return False
 
-
-
 min_bound_x = -30
 min_bound_y = -30
 min_bound_z = 0

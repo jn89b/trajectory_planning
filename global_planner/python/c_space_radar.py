@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import os
 
 from src.PositionVector import PositionVector
 from src.Grid import Grid, FWAgent
@@ -21,6 +23,19 @@ import plotly.express as px
 
 if __name__ == '__main__':
 
+    # load rcs values
+    # get pwd and append info/rcs_hash.csv
+    pwd = os.getcwd()
+    print(pwd)
+
+    rcs_file = 'info/rcs_hash.csv'
+    df = pd.read_csv(rcs_file, header=None)
+    #get first column
+    rpy_keys = df.iloc[:, 0]
+    rcs_vals = df.iloc[:, 1]
+
+    #convert to dictionary
+    rcs_hash = dict(zip(rpy_keys, rcs_vals))
 
     ## create agent
     start_position = PositionVector(50,15,5)
@@ -29,7 +44,7 @@ if __name__ == '__main__':
     fw_agent = FWAgent(start_position, 0, fw_agent_psi_dg)
     fw_agent.vehicle_constraints(horizontal_min_radius_m=60, 
                                  max_climb_angle_dg=5)
-    fw_agent.leg_m = 5
+    fw_agent.leg_m = 4
 
     fw_agent.set_goal_state(goal_position)
 
@@ -65,11 +80,10 @@ if __name__ == '__main__':
     detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
     radars = [radar1]
     
-
     weight_list = [0, 10, 100, 1000]
     paths = []
     for weight in weight_list:
-        sparse_astar = SparseAstar(grid, True, radars, 10)
+        sparse_astar = SparseAstar(grid, 10, True, rcs_hash, radars, weight)
         sparse_astar.init_nodes()
         sparse_astar.update_radar_weight(weight)
         returned_path = sparse_astar.search()
@@ -81,14 +95,28 @@ if __name__ == '__main__':
     ax.set_xlim(grid.x_min_m, grid.x_max_m)
     ax.set_ylim(grid.y_min_m, grid.y_max_m)
 
-    #plot path
+    # make a subplot with 3 rows
+    fig2,ax2 = plt.subplots(3,1)
 
+    #plot path
     for i,wp_path in enumerate(paths):
         path_x = [x[0] for x in wp_path]
         path_y = [x[1] for x in wp_path]
         path_z = [x[2] for x in wp_path]
+        roll_dg = [x[3] for x in wp_path]
+        pitch_dg = [x[4] for x in wp_path]
+        yaw_dg = [x[5] for x in wp_path]
         ax.plot(path_x, path_y, label=str(weight_list[i]))
-                
+        
+        ax2[0].plot(roll_dg, label=str(weight_list[i]))
+        ax2[1].plot(pitch_dg, label=str(weight_list[i]))
+        ax2[2].plot(yaw_dg, label=str(weight_list[i]))
+
+    ax2[0].set_title("Roll")
+    ax2[1].set_title("Pitch")
+    ax2[2].set_title("Yaw")
+
+
     #plot start and goal
     ax.plot(start_position.x, start_position.y, 'bo')
     ax.plot(goal_position.x, goal_position.y, 'bo')

@@ -7,6 +7,12 @@ from src.Grid import Grid
 
 import time
 
+def round_to_nearest_even(number:int):
+    rounded_number = round(number)
+    if rounded_number % 2 == 1:  # Check if the rounded number is odd
+        return rounded_number + 1  # If odd, add 1 to make it even
+    else:
+        return rounded_number  # If even, return it as is
 
 
 class Node(object):
@@ -17,9 +23,13 @@ class Node(object):
     h = heuristic 
     f = is total cost
     """
-    def __init__(self, parent, position:PositionVector, 
+    def __init__(self, parent, 
+                 position:PositionVector, 
+                 velocity_m:float=15,
+                 prev_psi_dg:float=0,
                  theta_dg:float=0, 
                  psi_dg:float=0):
+                 
         self.parent = parent 
         self.position = position # x,y,z coordinates
         if parent is not None:
@@ -29,9 +39,11 @@ class Node(object):
             self.theta_dg = np.arctan2(self.direction_vector[2], 
                                     np.linalg.norm(self.direction_vector[0:2]))
             self.theta_dg = np.rad2deg(self.theta_dg)
-
             self.psi_dg = np.arctan2(self.direction_vector[1], self.direction_vector[0])
             self.psi_dg = np.rad2deg(self.psi_dg)
+            delta_psi_rad = np.deg2rad(self.psi_dg - prev_psi_dg)
+            phi_rad = np.arctan((delta_psi_rad*velocity_m)/9.81)
+            self.phi_dg = np.rad2deg(phi_rad)
 
         else:
             self.direction_vector = np.array([self.position.x,
@@ -39,8 +51,11 @@ class Node(object):
                                               self.position.z])
             self.theta_dg = theta_dg
             self.psi_dg = psi_dg
-            
+            delta_psi_rad = np.deg2rad(self.psi_dg - prev_psi_dg)
+            phi_rad = np.arctan((delta_psi_rad*velocity_m)/9.81)
+            self.phi_dg = np.rad2deg(phi_rad)
 
+        
         self.g = 0
         self.h = 0
         self.f = 0
@@ -64,7 +79,10 @@ class Node(object):
 
 
 class SparseAstar():
-    def __init__(self, grid:Grid, use_radar:bool=False, 
+    def __init__(self, grid:Grid, 
+                 velocity=5,
+                 use_radar:bool=False,
+                 rcs_hash:dict={}, 
                  radar_info:list=[],
                  radar_weight:float=0) -> None:        
         self.open_set = PriorityQueue()
@@ -74,10 +92,13 @@ class SparseAstar():
         self.agent = grid.agent
         self.start_node = None
         self.goal_node = None
+        self.velocity = velocity
+
         self.use_radar = use_radar
         self.radars = radar_info
         self.radar_weight = radar_weight
-        
+        self.rcs_hash = rcs_hash
+
     def clear_sets(self):
         self.open_set = PriorityQueue()
         self.closed_set = {}
@@ -94,12 +115,14 @@ class SparseAstar():
         #     self.agent.position, direction_vector)
         
         self.start_node = Node(None, self.agent.position, 
+                               self.velocity, 0,
                                self.agent.theta_dg, self.agent.psi_dg)
         self.start_node.g = self.start_node.h = self.start_node.f = 0
         self.open_set.put((self.start_node.f, self.start_node))
 
         # self.goal_node = Node(None, rounded_goal_position)
         self.goal_node = Node(None, self.agent.goal_position, 
+                              self.velocity, 0,
                               self.agent.theta_dg, self.agent.psi_dg)
         self.goal_node.g = self.goal_node.h = self.goal_node.f = 0
 
@@ -140,6 +163,10 @@ class SparseAstar():
         cost = np.linalg.norm(node1.position.vec - node2.position.vec)
         return cost
 
+    def get_rcs_key(self, roll:int,pitch:int,yaw:int) -> str:
+        """returns the rcs key based on roll pitch yaw"""
+        return f"{roll}_{pitch}_{yaw}"
+
     def return_path(self,current_node):
         path = []
         current = current_node
@@ -148,6 +175,7 @@ class SparseAstar():
             states = [current.position.x, current.position.y, current.position.z]
             states.append(current.theta_dg)
             states.append(current.psi_dg)
+            states.append(current.phi_dg)
             path.append(states)
             current = current.parent
         # Return reversed path as we need to show from start to end path
@@ -203,7 +231,6 @@ class SparseAstar():
 
             if not expanded_moves:
                 continue
-                return self.closed_set, self.open_set
 
             for move in expanded_moves:
                 if str(list(move.vec)) in self.closed_set:
@@ -212,7 +239,8 @@ class SparseAstar():
                 if move == current_node.position:
                     continue
 
-                neighbor = Node(current_node, move)
+                neighbor = Node(current_node, move, self.velocity, 
+                                current_node.psi_dg)
                 neighbor.g = current_node.g + 1#self.compute_distance(current_node, neighbor)
                 radar_cost = 0
                 #compute heuristic based on radar 
@@ -221,9 +249,20 @@ class SparseAstar():
                         idx_pos = self.grid.convert_position_to_index(neighbor.position)
                         if idx_pos in radar.detection_info:
                             #get radar value
-                            radar_cost = radar.detection_info[idx_pos][0]
+                            radar_prelim_cost = radar.detection_info[idx_pos][0]
+                            even_psi = round_to_nearest_even(neighbor.psi_dg)
+                            rcs_key = self.get_rcs_key(
+                                int(neighbor.phi_dg), 
+                                int(neighbor.theta_dg), 
+                                int(even_psi))
+                            
+                            if rcs_key in self.rcs_hash:
+                                radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
+                            else:
+                                print("rcs key not found", rcs_key)
+                                radar_cost += radar_prelim_cost * 1
 
-                neighbor.h = (self.compute_distance(neighbor, self.goal_node)/2) + \
+                neighbor.h = (self.compute_distance(neighbor, self.goal_node)) + \
                     (self.radar_weight*radar_cost)
                 
                 neighbor.f = neighbor.g + 1*neighbor.h

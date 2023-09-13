@@ -78,7 +78,6 @@ class Agent
 
         // return a list of possible moves in 2D
         std::vector<PositionVector> getMoves2D(PositionVector current_pos);
-
 };
 
 

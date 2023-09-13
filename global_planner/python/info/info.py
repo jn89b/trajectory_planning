@@ -1,4 +1,8 @@
 import pandas as pd
+from scipy import interpolate
+import numpy as np
+#interpolate the data to get the rcs values for each angle
+
 """
 Notes
 - Every 9 columns is a single yaw starting from 0 
@@ -29,6 +33,8 @@ min_roll = -60
 max_pitch = 60
 min_pitch = -60
 
+pitch_step = 15
+roll_step = 15
 
 
 yaw_dict = {}
@@ -44,30 +50,48 @@ for i in range(0, len(df.columns), every_col_idx):
 # each of these yaw values contains a 2d array 
 # where each row represents the pitch and the columns represent the roll
 rcs_angles = {}
+
+pitch_list = np.arange(min_pitch, max_pitch+1, pitch_step)
+roll_list = np.arange(min_roll, max_roll+1, roll_step)
+
+
+pitch_loop = np.arange(min_pitch, max_pitch+1, 1)
+roll_loop = np.arange(min_roll, max_roll+1, 1)
+
 for yaw,pitch_roll_array in yaw_dict.items():
     #loop though yaw keys and get array
     # print(pitch_roll_array.shape)
     #loop through array and get pitch and roll values
-    pitch_step = (max_pitch - min_pitch)/pitch_roll_array.shape[0]
-    roll_step = (max_roll - min_roll)/pitch_roll_array.shape[1]
-    
-    for i in range(pitch_roll_array.shape[0]):
-        pitch_idx = int((i) * pitch_step) + int(min_pitch)
-        print(pitch_idx)
-        for j in range(pitch_roll_array.shape[1]):
-            
-            roll_idx = int((j) * roll_step) + int(min_roll)
-            key = f"{roll_idx}_{pitch_idx}_{int(yaw)}"
-            rcs_angles[key] = pitch_roll_array[i,j]
+
+    # Create a 2D interpolation function
+    interp_func = interpolate.interp2d(pitch_list, roll_list, 
+                                       pitch_roll_array, kind='linear')
+
+    print("interpolating")
+    for pitch in pitch_loop:
+        for roll in roll_loop:
+            # print(pitch, roll)
+            roll = int(roll)
+            pitch = int(pitch)
+            yaw = int(yaw)
+            key = f"{roll}_{pitch}_{yaw}"
+
+            rcs_angles[key] = interp_func(pitch, roll)
+
+
+#export this to a csv file
+rcs_hash = pd.DataFrame.from_dict(rcs_angles, orient='index')
+#save to csv
+rcs_hash.to_csv('rcs_hash.csv')
 
 # goal is to generate a hash table for each yaw angle 
 # something like this 
 euler_angles = {}
 
 # Define the roll, pitch, and yaw values
-roll = 30.0
-pitch = 45.0
-yaw = 60.0
+roll = int(30.0)
+pitch = int(45.0)
+yaw = int(60.0)
 
 # Create a key by concatenating the values
 key = f"{roll}_{pitch}_{yaw}"

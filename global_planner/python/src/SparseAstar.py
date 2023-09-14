@@ -58,6 +58,7 @@ class Node(object):
         
         self.g = 0
         self.h = 0
+        self.radar_cost = 0
         self.f = 0
         self.total_distance = 0
         self.total_time = 0
@@ -176,6 +177,9 @@ class SparseAstar():
             states.append(current.theta_dg)
             states.append(current.psi_dg)
             states.append(current.phi_dg)
+            states.append(current.radar_cost)
+            print("radar cost", current.radar_cost)
+            states.append(current.h)
             path.append(states)
             current = current.parent
         # Return reversed path as we need to show from start to end path
@@ -256,16 +260,23 @@ class SparseAstar():
                                 int(neighbor.theta_dg), 
                                 int(even_psi))
                             
-                            if rcs_key in self.rcs_hash:
-                                radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
-                            else:
-                                print("rcs key not found", rcs_key)
-                                radar_cost += radar_prelim_cost * 1
+                            dist_radar = np.linalg.norm(
+                                radar.pos.vec - neighbor.position.vec
+                            )
 
-                neighbor.h = (self.compute_distance(neighbor, self.goal_node)) + \
-                    (self.radar_weight*radar_cost)
+                            if rcs_key in self.rcs_hash:
+                                # radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
+                                radar_cost = radar.compute_prob_detect(dist_radar, 
+                                                                        self.rcs_hash[rcs_key],
+                                                                        self.radar_weight)
+                                # print("radar cost", radar_cost, "rcs", self.rcs_hash[rcs_key])
+                            else:
+                                radar_cost = 1# radar_prelim_cost * 1
                 
-                neighbor.f = neighbor.g + 1*neighbor.h
+                neighbor.radar_cost = self.radar_weight*radar_cost
+                neighbor.h = (self.compute_distance(neighbor, self.goal_node))
+                
+                neighbor.f = neighbor.g +  neighbor.h + neighbor.radar_cost
                 self.open_set.put((neighbor.f, neighbor))
 
             

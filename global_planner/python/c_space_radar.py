@@ -69,9 +69,9 @@ if __name__ == '__main__':
         'azimuth_angle_dg': 45,
         'elevation_angle_dg': 80, #this is wrt to z axis
         'radar_range_m': 80,    
-        'max_fov_dg': 90, 
+        'max_fov_dg': 120, 
         'vert_max_fov_dg': 80,
-        'c1': -0.1,
+        'c1': -0.05,
         'c2': 500,
         'grid': grid
     }
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
     radars = [radar1]
     
-    weight_list = [0, 10, 100, 1000]
+    weight_list = [0, 10, 100, 1000, 10E5]
     paths = []
     for weight in weight_list:
         sparse_astar = SparseAstar(grid, 10, True, rcs_hash, radars, weight)
@@ -97,6 +97,7 @@ if __name__ == '__main__':
 
     # make a subplot with 3 rows
     fig2,ax2 = plt.subplots(3,1)
+    fig3,ax3 = plt.subplots()
 
     #plot path
     for i,wp_path in enumerate(paths):
@@ -106,15 +107,23 @@ if __name__ == '__main__':
         roll_dg = [x[3] for x in wp_path]
         pitch_dg = [x[4] for x in wp_path]
         yaw_dg = [x[5] for x in wp_path]
+        f_cost = [x[6] for x in wp_path]
+        h_cost = [x[7] for x in wp_path]
         ax.plot(path_x, path_y, label=str(weight_list[i]))
         
         ax2[0].plot(roll_dg, label=str(weight_list[i]))
         ax2[1].plot(pitch_dg, label=str(weight_list[i]))
         ax2[2].plot(yaw_dg, label=str(weight_list[i]))
+        color = ax2[0].lines[-1].get_color()
+        ax3.plot(f_cost, label=str(weight_list[i])+'radar_cost', linestyle='dotted')
+        ax3.plot(h_cost, label=str(weight_list[i])+'h_cost', linestyle='dashed')
 
     ax2[0].set_title("Roll")
     ax2[1].set_title("Pitch")
     ax2[2].set_title("Yaw")
+
+    ax3.set_ylabel("Cost")
+    ax3.legend()
 
 
     #plot start and goal
@@ -152,7 +161,8 @@ if __name__ == '__main__':
     for pos in voxel_positions:
         voxel_image = plt.Rectangle((pos[0], pos[1]),
                                     1, 1, 
-                                    color='r', fill=False)
+                                    color='red', fill=False,
+                                    alpha=0.1)
         
         ax.add_artist(voxel_image)
 

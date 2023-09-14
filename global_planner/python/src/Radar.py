@@ -181,8 +181,25 @@ class Radar():
         computes the preliminary probability of 
         instantaneous detection without consideration of RCS
         """
-        # return 1/(1 +(self.c2*dist**4)**self.c1)
-        return 1 - (dist/self.radar_range_m)
+        #return 1/(1 +(self.c2*dist**4)**self.c1) 
+        # return 1 - (dist/self.radar_range_m)
+        return 1 
+    
+    def compute_prob_detect(self, dist, rcs_val:float, dist_weight:float=10):
+        
+        linear_db = 10**(rcs_val/10)
+        # return 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1)
+        # print("linear db", linear_db)
+        # return 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1)
+
+        # return 1/(1 +(self.c2*dist**4 / -rcs_val)**self.c1)
+
+        return 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1) + \
+            (dist_weight*(1 - (dist/self.radar_range_m)))
+
+
+        return 1/(1 +(self.c2*dist**4 / -rcs_val)**self.c1) + \
+            (dist_weight*(1 - (dist/self.radar_range_m)))
 
 if __name__ == "__main__":
     pass

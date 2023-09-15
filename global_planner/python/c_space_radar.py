@@ -187,9 +187,21 @@ if __name__ == '__main__':
         voxels.append([pos.x, pos.y, pos.z])
         voxel_vals.append(v[0]) 
 
-    voxel_x = [x[0] for x in voxels]
-    voxel_y = [x[1] for x in voxels]
-    voxel_z = [x[2] for x in voxels]
+
+    voxel_step = 10
+
+    voxel_x = []
+    voxel_y = []
+    voxel_z = []
+    for i, voxel in enumerate(voxels):
+        if i % voxel_step == 0:
+            voxel_x.append(voxel[0])
+            voxel_y.append(voxel[1])
+            voxel_z.append(voxel[2])
+
+    # voxel_x = [x[0] for x in voxels]
+    # voxel_y = [x[1] for x in voxels]
+    # voxel_z = [x[2] for x in voxels]
 
     voxel_data = go.Scatter3d(
         x=voxel_x,

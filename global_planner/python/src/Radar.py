@@ -186,13 +186,13 @@ class Radar():
         # return 1 - (dist/self.radar_range_m)
         return 1 
     
-    def compute_prob_detect(self, dist, rcs_val:float, 
-                            dist_weight:float=1):
-        
+    def compute_prob_detect(self, dist, rcs_val:float):
+        """
+        Computes the probability of detection for the radar
+        """        
         linear_db = 10**(rcs_val/10) 
         radar_prob_detection = 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1)
         probability_detection = 1- pow(radar_prob_detection , self.radar_fq_hz)
-        # print("radar prob detection", probability_detection)
 
         return probability_detection
 

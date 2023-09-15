@@ -16,7 +16,7 @@ Should only be about 3mb
 """
 
 # enter parameters here
-file_name = 'info/sig_mat_45.csv' #90 deg
+file_name = 'info/sig_mat_45front_90rear.csv' #90 deg
 #no colunm names
 df = pd.read_csv(file_name, header=None)
 
@@ -86,7 +86,7 @@ for yaw,pitch_roll_array in yaw_dict.items():
 #export this to a csv file
 rcs_hash = pd.DataFrame.from_dict(rcs_angles, orient='index')
 #save to csv
-rcs_hash.to_csv('sig_mat_45_has.csv')
+rcs_hash.to_csv('info/sig_mat_45front_90rear_hash.csv')
 
 # goal is to generate a hash table for each yaw angle 
 # something like this 

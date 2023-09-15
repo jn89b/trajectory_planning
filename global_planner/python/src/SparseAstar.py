@@ -59,9 +59,11 @@ class Node(object):
         self.g = 0
         self.h = 0
         self.radar_cost = 0
+        self.radar_detection = 0
         self.f = 0
         self.total_distance = 0
         self.total_time = 0
+        self.rcs_value = 0
 
         
     def get_direction_vector(self) -> np.array:
@@ -85,7 +87,8 @@ class SparseAstar():
                  use_radar:bool=False,
                  rcs_hash:dict={}, 
                  radar_info:list=[],
-                 radar_weight:float=0) -> None:        
+                 radar_weight:float=0, 
+                 max_rcs:float=1) -> None:        
         self.open_set = PriorityQueue()
         self.closed_set = {}
 
@@ -99,6 +102,7 @@ class SparseAstar():
         self.radars = radar_info
         self.radar_weight = radar_weight
         self.rcs_hash = rcs_hash
+        self.max_rcs = max_rcs
 
     def clear_sets(self):
         self.open_set = PriorityQueue()
@@ -175,11 +179,10 @@ class SparseAstar():
         while current is not None:
             states = [current.position.x, current.position.y, current.position.z]
             states.append(current.theta_dg)
-            states.append(current.psi_dg)
             states.append(current.phi_dg)
-            states.append(current.radar_cost)
-            print("radar cost", current.radar_cost)
-            states.append(current.h)
+            states.append(current.psi_dg)
+            states.append(current.rcs_value)
+            states.append(current.radar_detection)
             path.append(states)
             current = current.parent
         # Return reversed path as we need to show from start to end path
@@ -245,16 +248,23 @@ class SparseAstar():
 
                 neighbor = Node(current_node, move, self.velocity, 
                                 current_node.psi_dg)
-                neighbor.g = current_node.g + 1#self.compute_distance(current_node, neighbor)
                 radar_cost = 0
+                rcs_val = -100
                 #compute heuristic based on radar 
                 if self.use_radar:
                     for radar in self.radars:
                         idx_pos = self.grid.convert_position_to_index(neighbor.position)
                         if idx_pos in radar.detection_info:
                             #get radar value
-                            radar_prelim_cost = radar.detection_info[idx_pos][0]
-                            even_psi = round_to_nearest_even(neighbor.psi_dg)
+                            #wrap psi_dg between 0 and 360
+                            wrapped_psi_dg = neighbor.psi_dg
+                            if wrapped_psi_dg > 360:
+                                wrapped_psi_dg -= 360
+                            if wrapped_psi_dg < 0:
+                                wrapped_psi_dg += 360
+
+                                
+                            even_psi = round_to_nearest_even(wrapped_psi_dg)
                             rcs_key = self.get_rcs_key(
                                 int(neighbor.phi_dg), 
                                 int(neighbor.theta_dg), 
@@ -265,17 +275,32 @@ class SparseAstar():
                             )
 
                             if rcs_key in self.rcs_hash:
+                                linear_max_db = 10**(self.max_rcs/10)
+                                linear_db = 10**(self.rcs_hash[rcs_key]/10)
+                                    # print("linear db", linear_db)
+                                    # print("linear max db", linear_max_db)
+                                norm_rcs = linear_db/linear_max_db
                                 # radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
                                 radar_cost = radar.compute_prob_detect(dist_radar, 
-                                                                        self.rcs_hash[rcs_key],
-                                                                        self.radar_weight)
+                                                                        self.rcs_hash[rcs_key])
+                                
+                                rcs_val = self.rcs_hash[rcs_key]
                                 # print("radar cost", radar_cost, "rcs", self.rcs_hash[rcs_key])
                             else:
+                                print("rcs key not found", rcs_key, 
+                                      neighbor.phi_dg, neighbor.theta_dg,neighbor.psi_dg)
                                 radar_cost = 1# radar_prelim_cost * 1
+                                rcs_val = 1
+
+                        else:
+                            radar_cost = 0
+                            rcs_val = -100
                 
+                neighbor.g = current_node.g + 1
+                neighbor.rcs_value = rcs_val
+                neighbor.radar_detection = radar_cost
                 neighbor.radar_cost = self.radar_weight*radar_cost
                 neighbor.h = (self.compute_distance(neighbor, self.goal_node))
-                
                 neighbor.f = neighbor.g +  neighbor.h + neighbor.radar_cost
                 self.open_set.put((neighbor.f, neighbor))
 

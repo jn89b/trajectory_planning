@@ -66,10 +66,10 @@ def compute():
     plt.title('Probability of Detecting Aircraft')
 
 def changing_c1():
-     Skywalker1 = Plane(0.07, 0, 0, 30)
+     Skywalker1 = Plane(0.000278, 0, 0, 30)
      
      
-     c1_array = np.arange(-0.3, -0.28, 0.0025)
+     c1_array = np.arange(-0.3, -0.2, 0.01)
      
      
      overall_p_detection = []
@@ -80,7 +80,7 @@ def changing_c1():
          p_detection = []
          sky_walker_position = []
          Skywalker1.x = x_position
-         for x in range(1200):
+         for x in range(150):
              Skywalker1.x = x
              instant_detection = Radar1.compute_instant_detection(Skywalker1)
              p_detection.append(Radar1.compute_probability_detection(instant_detection))

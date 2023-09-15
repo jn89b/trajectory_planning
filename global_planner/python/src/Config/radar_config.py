@@ -7,5 +7,6 @@ radar_inputs = {
     'vert_max_fov_dg': None,
     'c1': None,
     'c2': None,
+    'radar_fq_hz': None,
     'grid': None
 }

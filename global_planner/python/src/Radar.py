@@ -24,6 +24,7 @@ class Radar():
         self.radar_range_m = radar_params['radar_range_m']
         self.max_fov_dg = radar_params['max_fov_dg']
         self.max_fov_rad = np.deg2rad(self.max_fov_dg)
+        self.radar_fq_hz = radar_params['radar_fq_hz']
 
         self.vert_max_fov_dg = radar_params['vert_max_fov_dg']
         self.vert_max_fov_rad = np.deg2rad(self.vert_max_fov_dg)
@@ -185,21 +186,15 @@ class Radar():
         # return 1 - (dist/self.radar_range_m)
         return 1 
     
-    def compute_prob_detect(self, dist, rcs_val:float, dist_weight:float=10):
-        
-        linear_db = 10**(rcs_val/10)
-        # return 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1)
-        # print("linear db", linear_db)
-        # return 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1)
+    def compute_prob_detect(self, dist, rcs_val:float):
+        """
+        Computes the probability of detection for the radar
+        """        
+        linear_db = 10**(rcs_val/10) 
+        radar_prob_detection = 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1)
+        probability_detection = 1- pow(radar_prob_detection , self.radar_fq_hz)
 
-        # return 1/(1 +(self.c2*dist**4 / -rcs_val)**self.c1)
-
-        return 1/(1 +(self.c2* np.power(dist,4) / linear_db)**self.c1) + \
-            (dist_weight*(1 - (dist/self.radar_range_m)))
-
-
-        return 1/(1 +(self.c2*dist**4 / -rcs_val)**self.c1) + \
-            (dist_weight*(1 - (dist/self.radar_range_m)))
+        return probability_detection
 
 if __name__ == "__main__":
     pass

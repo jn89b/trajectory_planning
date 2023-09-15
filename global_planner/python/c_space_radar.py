@@ -28,11 +28,14 @@ if __name__ == '__main__':
     pwd = os.getcwd()
     print(pwd)
 
-    rcs_file = 'info/rcs_hash.csv'
+    rcs_file = 'info/sig_mat_45front_90rear_hash.csv'
+    # rcs_file = 'info/rcs_hash.csv'
     df = pd.read_csv(rcs_file, header=None)
     #get first column
     rpy_keys = df.iloc[:, 0]
     rcs_vals = df.iloc[:, 1]
+    
+    max_rcs_val = min(rcs_vals)
 
     #convert to dictionary
     rcs_hash = dict(zip(rpy_keys, rcs_vals))
@@ -66,13 +69,14 @@ if __name__ == '__main__':
     radar_pos = PositionVector(15, 15, 0)
     radar_params = {
         'pos': radar_pos,
-        'azimuth_angle_dg': 45,
+        'azimuth_angle_dg': 55,
         'elevation_angle_dg': 80, #this is wrt to z axis
         'radar_range_m': 80,    
         'max_fov_dg': 120, 
         'vert_max_fov_dg': 80,
-        'c1': -0.05,
-        'c2': 500,
+        'c1': -0.29,
+        'c2': 1200,
+        'radar_fq_hz': 10000,
         'grid': grid
     }
 
@@ -80,10 +84,10 @@ if __name__ == '__main__':
     detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
     radars = [radar1]
     
-    weight_list = [0, 10, 100, 1000, 10E5]
+    weight_list = [0, 10, 20, 50]
     paths = []
     for weight in weight_list:
-        sparse_astar = SparseAstar(grid, 10, True, rcs_hash, radars, weight)
+        sparse_astar = SparseAstar(grid, 2, True, rcs_hash, radars, weight, max_rcs_val)
         sparse_astar.init_nodes()
         sparse_astar.update_radar_weight(weight)
         returned_path = sparse_astar.search()
@@ -98,6 +102,7 @@ if __name__ == '__main__':
     # make a subplot with 3 rows
     fig2,ax2 = plt.subplots(3,1)
     fig3,ax3 = plt.subplots()
+    fig4,ax4 = plt.subplots()
 
     #plot path
     for i,wp_path in enumerate(paths):
@@ -108,22 +113,29 @@ if __name__ == '__main__':
         pitch_dg = [x[4] for x in wp_path]
         yaw_dg = [x[5] for x in wp_path]
         f_cost = [x[6] for x in wp_path]
-        h_cost = [x[7] for x in wp_path]
-        ax.plot(path_x, path_y, label=str(weight_list[i]))
+        radar_detect = [x[7] for x in wp_path]
+
+        print("path length", len(path_x))
+        print("radar detect length", len(radar_detect))
+
+        ax.plot(path_x, path_y, '-o', label=str(weight_list[i]))
         
         ax2[0].plot(roll_dg, label=str(weight_list[i]))
         ax2[1].plot(pitch_dg, label=str(weight_list[i]))
         ax2[2].plot(yaw_dg, label=str(weight_list[i]))
         color = ax2[0].lines[-1].get_color()
-        ax3.plot(f_cost, label=str(weight_list[i])+'radar_cost', linestyle='dotted')
-        ax3.plot(h_cost, label=str(weight_list[i])+'h_cost', linestyle='dashed')
+        ax3.plot(f_cost, '-o', label=str(weight_list[i])+'rcs_value')
+        ax4.plot(radar_detect,'-o', label=str(weight_list[i])+'radar detect')
 
     ax2[0].set_title("Roll")
     ax2[1].set_title("Pitch")
     ax2[2].set_title("Yaw")
 
-    ax3.set_ylabel("Cost")
+    ax3.set_ylabel("RCS")
     ax3.legend()
+
+    ax4.set_ylabel("Radar Detection")
+    ax4.legend()
 
 
     #plot start and goal
@@ -175,9 +187,21 @@ if __name__ == '__main__':
         voxels.append([pos.x, pos.y, pos.z])
         voxel_vals.append(v[0]) 
 
-    voxel_x = [x[0] for x in voxels]
-    voxel_y = [x[1] for x in voxels]
-    voxel_z = [x[2] for x in voxels]
+
+    voxel_step = 10
+
+    voxel_x = []
+    voxel_y = []
+    voxel_z = []
+    for i, voxel in enumerate(voxels):
+        if i % voxel_step == 0:
+            voxel_x.append(voxel[0])
+            voxel_y.append(voxel[1])
+            voxel_z.append(voxel[2])
+
+    # voxel_x = [x[0] for x in voxels]
+    # voxel_y = [x[1] for x in voxels]
+    # voxel_z = [x[2] for x in voxels]
 
     voxel_data = go.Scatter3d(
         x=voxel_x,
@@ -190,7 +214,7 @@ if __name__ == '__main__':
             colorscale='Viridis',
             # color_discrete_sequence=px.colors.qualitative.Plotly,
             size=3,
-            opacity=0.1,
+            opacity=0.1
         )
     )
 

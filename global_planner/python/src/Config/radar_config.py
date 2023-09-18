@@ -10,3 +10,5 @@ radar_inputs = {
     'radar_fq_hz': None,
     'grid': None
 }
+
+RADAR_AIRCRAFT_HASH_FILE = 'info/plane_sig_hash.csv'

@@ -172,6 +172,12 @@ class SparseAstar():
         """returns the rcs key based on roll pitch yaw"""
         return f"{roll}_{pitch}_{yaw}"
 
+
+    def get_key(self, azimith_dg:int, elevation_dg:int) -> str:
+        """returns the rcs key based on roll pitch yaw"""
+        return f"{azimith_dg}_{elevation_dg}"
+
+
     def return_path(self,current_node):
         path = []
         current = current_node
@@ -258,17 +264,27 @@ class SparseAstar():
                             #get radar value
                             #wrap psi_dg between 0 and 360
                             wrapped_psi_dg = neighbor.psi_dg
-                            if wrapped_psi_dg > 360:
-                                wrapped_psi_dg -= 360
-                            if wrapped_psi_dg < 0:
-                                wrapped_psi_dg += 360
 
-                                
-                            even_psi = round_to_nearest_even(wrapped_psi_dg)
-                            rcs_key = self.get_rcs_key(
-                                int(neighbor.phi_dg), 
-                                int(neighbor.theta_dg), 
-                                int(even_psi))
+
+                            rel_phi_dg = neighbor.phi_dg
+                            rel_theta_dg = neighbor.theta_dg - (90 - radar.elevation_angle_dg)
+                            rel_psi_dg = wrapped_psi_dg - radar.azmith_angle_dg
+                            # rel_psi_dg = radar.azmith_angle_dg - wrapped_psi_dg
+
+                            if rel_psi_dg > 360:
+                                rel_psi_dg -= 360
+                            if rel_psi_dg < 0:
+                                rel_psi_dg += 360
+
+                            #even_psi = round_to_nearest_even(rel_psi_dg)
+                            rcs_key = self.get_key(
+                                int(rel_psi_dg),
+                                int(0)
+                            )
+                            # rcs_key = self.get_rcs_key(
+                            #     int(0), 
+                            #     int(0), 
+                            #     int(even_psi))
                             
                             dist_radar = np.linalg.norm(
                                 radar.pos.vec - neighbor.position.vec

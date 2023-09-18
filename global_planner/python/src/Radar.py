@@ -83,6 +83,7 @@ class Radar():
         returns the cells that are within the radar fov
         in 2d scale
         """
+        detection_voxels = []
         fov_upp_dg = np.rad2deg(self.lat_fov_upp_rad)
         fov_low_dg = np.rad2deg(self.lat_fov_low_rad)
 
@@ -102,9 +103,9 @@ class Radar():
             r_max_y = self.pos.y + self.radar_range_m*np.sin(np.deg2rad(bearing))
             bearing_rays = fast_voxel_algo(self.pos.x , self.pos.y, 
                                         r_max_x, r_max_y, obs_list)
-            self.detection_voxels.extend(bearing_rays)
+            detection_voxels.extend(bearing_rays)
 
-        return self.detection_voxels
+        return detection_voxels
 
     def compute_fov_cells_3d(self, obs_list=[]) -> list:
         """returns """
@@ -127,9 +128,6 @@ class Radar():
         else:
             max_vert_dg = vert_fov_upp_dg
             min_vert_dg = vert_fov_low_dg
-
-        print("max lat dg", max_lat_dg)
-        print("min lat dg", min_lat_dg)
 
         azmith_bearing_dgs = np.arange(min_lat_dg, max_lat_dg+1)
         elevation_bearing_dgs = np.arange(min_vert_dg, max_vert_dg+1)
@@ -164,16 +162,13 @@ class Radar():
                         if detect_val > max_radar_val:
                             max_radar_val = detect_val
 
-                # self.detection_voxels.extend(bearing_rays)
 
         #normalize radar values
         for k,v in self.detection_info.items():
             self.detection_info[k] = (v[0]/max_radar_val, v[1])
 
         #print size of detection info
-        print("size of detection info", len(self.detection_info))
-        # print(len(azmith_bearing_dgs)*len(elevation_bearing_dgs))
-
+        
         return self.detection_info
 
 

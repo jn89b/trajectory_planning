@@ -191,7 +191,7 @@ class ApproachGoal():
 
                 position_density_vals = []
                 sum_power_density = 0
-                for br in bearing_rays:
+                for br in bearing_rays[15:]:
                     pos = PositionVector(br[0], br[1], br[2])
                     # if pos not in self.detection_info:
                     dist = np.linalg.norm(pos.vec - self.pos.vec)
@@ -213,7 +213,7 @@ class ApproachGoal():
 
     def compute_power_density(self, target_distance:float) -> float:
         """computes the power density and returns the value"""
-        return self.effector_power / (target_distance**2 * 4*np.pi)
+        return self.effector_power / (target_distance * 4*np.pi)
 
 if __name__ == '__main__':
     origin_pos = PositionVector(10 , 10 ,10)
@@ -225,12 +225,12 @@ if __name__ == '__main__':
         'max_fov_dg': 300,
         'vert_max_fov_dg': 60,
         'grid': None,
-        'effector_power': 5,
+        'effector_power': 50,
         'fov_dg_steps': 15,
         'vert_fov_dg_steps': 15
     }
 
-    required_sum_power_density = 0.5
+    required_sum_power_density = 1.0
     
     obs_positions = [(45, 45, 10),
                      (25, 65, 10),
@@ -291,8 +291,36 @@ if __name__ == '__main__':
             opacity=1.0
         )
     )
+
+    layout = go.Layout(
+        scene=dict(
+            xaxis=dict(
+                title='X Axis',
+                gridcolor='rgb(255, 255, 255)',
+                zerolinecolor='rgb(255, 255, 255)',
+                showbackground=True,
+                backgroundcolor='rgb(230, 230,230)'
+            ),
+            yaxis=dict(
+                title='Y Axis',
+                gridcolor='rgb(255, 255, 255)',
+                zerolinecolor='rgb(255, 255, 255)',
+                showbackground=True,
+                backgroundcolor='rgb(230, 230,230)'
+            ),
+            zaxis=dict(
+                title='Z Axis',
+                gridcolor='rgb(255, 255, 255)',
+                zerolinecolor='rgb(255, 255, 255)',
+                showbackground=True,
+                backgroundcolor='rgb(230, 230,230)'
+            )
+        ),
+        title='Approach Vector to Target'
+    )
+
     
-    fig = go.Figure(data=[voxel_data])
+    fig = go.Figure(data=[voxel_data], layout=layout)
     fig.add_trace(origin_data)
     fig.show()
     fig.write_html("effector.html")

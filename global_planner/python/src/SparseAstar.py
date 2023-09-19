@@ -261,26 +261,26 @@ class SparseAstar():
                     rcs_val = -100
                     for radar in self.radars:
                         idx_pos = self.grid.convert_position_to_index(neighbor.position)
+                        #get radar value
+                        #wrap psi_dg between 0 and 360
+                        wrapped_psi_dg = neighbor.psi_dg
+
+                        rel_phi_dg = neighbor.phi_dg
+                        rel_theta_dg = neighbor.theta_dg - (90 - radar.elevation_angle_dg)
+                        # rel_psi_dg = wrapped_psi_dg - radar.azmith_angle_dg
+                        # rel_psi_dg = radar.azmith_angle_dg - wrapped_psi_dg
+
+                        dy = neighbor.position.y - radar.pos.y
+                        dx = neighbor.position.x - radar.pos.x
+                        rel_psi_dg = np.arctan2(dy, dx) * 180 / np.pi
+                        rel_psi_dg = rel_psi_dg - neighbor.psi_dg + 180
+
+                        if rel_psi_dg > 360:
+                            rel_psi_dg -= 360
+                        if rel_psi_dg < 0:
+                            rel_psi_dg += 360
+
                         if idx_pos in radar.detection_info:
-                            #get radar value
-                            #wrap psi_dg between 0 and 360
-                            wrapped_psi_dg = neighbor.psi_dg
-
-                            rel_phi_dg = neighbor.phi_dg
-                            rel_theta_dg = neighbor.theta_dg - (90 - radar.elevation_angle_dg)
-                            # rel_psi_dg = wrapped_psi_dg - radar.azmith_angle_dg
-                            # rel_psi_dg = radar.azmith_angle_dg - wrapped_psi_dg
-
-                            dy = neighbor.position.y - radar.pos.y
-                            dx = neighbor.position.x - radar.pos.x
-                            rel_psi_dg = np.arctan2(dy, dx) * 180 / np.pi
-                            rel_psi_dg = rel_psi_dg - neighbor.psi_dg + 180
-                            # rel_psi_dg = rel_psi_dg - radar.azmith_angle_dg
-
-                            if rel_psi_dg > 360:
-                                rel_psi_dg -= 360
-                            if rel_psi_dg < 0:
-                                rel_psi_dg += 360
 
                             #even_psi = round_to_nearest_even(rel_psi_dg)
                             rcs_key = self.get_key(
@@ -295,8 +295,6 @@ class SparseAstar():
                             if rcs_key in self.rcs_hash:
                                 linear_max_db = 10**(self.max_rcs/10)
                                 linear_db = 10**(self.rcs_hash[rcs_key]/10)
-                                    # print("linear db", linear_db)
-                                    # print("linear max db", linear_max_db)
                                 norm_rcs = linear_db/linear_max_db
                                 # radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
                                 radar_cost = radar.compute_prob_detect(dist_radar, 
@@ -305,7 +303,6 @@ class SparseAstar():
                                 rcs_val = self.rcs_hash[rcs_key]
 
                         else:
-                            print("searching for radar detection")
                             #Need to fix voxel detections this is a hacky way to fix it
                             z_vals = [0, 1, -1, 2, -2]
                             y_vals = [0, 1, -1, 2, -2]
@@ -332,6 +329,7 @@ class SparseAstar():
                                                                                 self.rcs_hash[rcs_key])
                                         rcs_val = self.rcs_hash[rcs_key]
                                         break
+
                             for x,y in zip(x_vals, y_vals):
                                 next_x = neighbor.position.x + x
                                 next_y = neighbor.position.y + y

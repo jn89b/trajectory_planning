@@ -268,8 +268,14 @@ class SparseAstar():
 
                             rel_phi_dg = neighbor.phi_dg
                             rel_theta_dg = neighbor.theta_dg - (90 - radar.elevation_angle_dg)
-                            rel_psi_dg = wrapped_psi_dg - radar.azmith_angle_dg
+                            # rel_psi_dg = wrapped_psi_dg - radar.azmith_angle_dg
                             # rel_psi_dg = radar.azmith_angle_dg - wrapped_psi_dg
+
+                            dy = neighbor.position.y - radar.pos.y
+                            dx = neighbor.position.x - radar.pos.x
+                            rel_psi_dg = np.arctan2(dy, dx) * 180 / np.pi
+                            rel_psi_dg = rel_psi_dg - neighbor.psi_dg + 180
+                            # rel_psi_dg = rel_psi_dg - radar.azmith_angle_dg
 
                             if rel_psi_dg > 360:
                                 rel_psi_dg -= 360

@@ -189,13 +189,15 @@ class Grid():
                 return True
 
     def convert_position_to_index(self, position:PositionVector) -> int:
-        """returns 1D index of position"""
-        if position.z == 0:
-            return int(position.x + position.y * self.sx)
-        else:
-            index = position.x + (position.y * self.sx) + \
-                (position.z * self.sx * self.sy)
-            return int(index)
+        # """returns 1D index of position"""
+        tuple_position = (int(position.x), int(position.y), int(position.z))
+        return "_".join(map(str, tuple_position))
+        # if position.z == 0:
+        #     return int(position.x + position.y * self.sx)
+        # else:
+        #     index = position.x + (position.y * self.sx) + \
+        #         (position.z * self.sx * self.sy)
+        #     return int(index)
         
     def convert_index_to_position(self, index:int) -> PositionVector:
         """returns position from 1D index"""

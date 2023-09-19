@@ -162,7 +162,6 @@ class Radar():
                         if detect_val > max_radar_val:
                             max_radar_val = detect_val
 
-
         #normalize radar values
         for k,v in self.detection_info.items():
             self.detection_info[k] = (v[0]/max_radar_val, v[1])

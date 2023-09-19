@@ -193,7 +193,7 @@ class SparseAstar():
             current = current.parent
         # Return reversed path as we need to show from start to end path
         path = path[::-1]
-        start_value = 0
+        
         waypoints = []
         for points in path:
             waypoints.append(points)
@@ -254,17 +254,17 @@ class SparseAstar():
 
                 neighbor = Node(current_node, move, self.velocity, 
                                 current_node.psi_dg)
-                radar_cost = 0
-                rcs_val = -100
+
                 #compute heuristic based on radar 
                 if self.use_radar:
+                    radar_cost = 0
+                    rcs_val = -100
                     for radar in self.radars:
                         idx_pos = self.grid.convert_position_to_index(neighbor.position)
                         if idx_pos in radar.detection_info:
                             #get radar value
                             #wrap psi_dg between 0 and 360
                             wrapped_psi_dg = neighbor.psi_dg
-
 
                             rel_phi_dg = neighbor.phi_dg
                             rel_theta_dg = neighbor.theta_dg - (90 - radar.elevation_angle_dg)
@@ -281,10 +281,6 @@ class SparseAstar():
                                 int(rel_psi_dg),
                                 int(0)
                             )
-                            # rcs_key = self.get_rcs_key(
-                            #     int(0), 
-                            #     int(0), 
-                            #     int(even_psi))
                             
                             dist_radar = np.linalg.norm(
                                 radar.pos.vec - neighbor.position.vec
@@ -301,17 +297,59 @@ class SparseAstar():
                                                                         self.rcs_hash[rcs_key])
                                 
                                 rcs_val = self.rcs_hash[rcs_key]
-                                # print("radar cost", radar_cost, "rcs", self.rcs_hash[rcs_key])
-                            else:
-                                print("rcs key not found", rcs_key, 
-                                      neighbor.phi_dg, neighbor.theta_dg,neighbor.psi_dg)
-                                radar_cost = 1# radar_prelim_cost * 1
-                                rcs_val = 1
 
                         else:
-                            radar_cost = 0
-                            rcs_val = -100
-                
+                            print("searching for radar detection")
+                            #Need to fix voxel detections this is a hacky way to fix it
+                            z_vals = [0, 1, -1, 2, -2]
+                            y_vals = [0, 1, -1, 2, -2]
+                            x_vals = [0, 1, -1, 2, -2]
+                            for z in z_vals:
+                                next_z = neighbor.position.z + z
+                                new_pos = PositionVector(neighbor.position.x,
+                                                            neighbor.position.y,
+                                                            next_z)
+                                idx_pos = self.grid.convert_position_to_index(new_pos)
+                                if idx_pos in radar.detection_info:
+                                    rcs_key = self.get_key(
+                                        int(rel_psi_dg),
+                                        int(0)
+                                    )
+                                    dist_radar = np.linalg.norm(
+                                        radar.pos.vec - new_pos.vec
+                                    )
+                                    if rcs_key in self.rcs_hash:
+                                        linear_max_db = 10**(self.max_rcs/10)
+                                        linear_db = 10**(self.rcs_hash[rcs_key]/10)
+                                        norm_rcs = linear_db/linear_max_db
+                                        radar_cost = radar.compute_prob_detect(dist_radar, 
+                                                                                self.rcs_hash[rcs_key])
+                                        rcs_val = self.rcs_hash[rcs_key]
+                                        break
+                            for x,y in zip(x_vals, y_vals):
+                                next_x = neighbor.position.x + x
+                                next_y = neighbor.position.y + y
+                                new_pos = PositionVector(next_x,
+                                                            next_y,
+                                                            neighbor.position.z)
+                                idx_pos = self.grid.convert_position_to_index(new_pos)
+                                if idx_pos in radar.detection_info:
+                                    rcs_key = self.get_key(
+                                        int(rel_psi_dg),
+                                        int(0)
+                                    )
+                                    dist_radar = np.linalg.norm(
+                                        radar.pos.vec - new_pos.vec
+                                    )
+                                    if rcs_key in self.rcs_hash:
+                                        linear_max_db = 10**(self.max_rcs/10)
+                                        linear_db = 10**(self.rcs_hash[rcs_key]/10)
+                                        norm_rcs = linear_db/linear_max_db
+                                        radar_cost = radar.compute_prob_detect(dist_radar, 
+                                                                                self.rcs_hash[rcs_key])
+                                        rcs_val = self.rcs_hash[rcs_key]
+                                        break
+                                    
                 neighbor.g = current_node.g + 1
                 neighbor.rcs_value = rcs_val
                 neighbor.radar_detection = radar_cost
@@ -320,6 +358,5 @@ class SparseAstar():
                 neighbor.f = neighbor.g +  neighbor.h + neighbor.radar_cost
                 self.open_set.put((neighbor.f, neighbor))
 
-            
-        # return self.closed_set, self.open_set
+
         return self.return_path(current_node)

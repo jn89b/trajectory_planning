@@ -58,7 +58,7 @@ if __name__ == '__main__':
     obs_positions = [(45, 45, 10),
                      (25, 65, 10),
                      (55, 30, 10)]
-    
+    # obs_positions = []
     obs_list = []
     for pos in obs_positions:
         obs_position = PositionVector(pos[0], pos[1], pos[2])
@@ -122,9 +122,9 @@ if __name__ == '__main__':
 
         ax.plot(path_x, path_y, '-o', label=str(weight_list[i]))
         
-        ax2[0].plot(roll_dg, label=str(weight_list[i]))
-        ax2[1].plot(pitch_dg, label=str(weight_list[i]))
-        ax2[2].plot(yaw_dg, label=str(weight_list[i]))
+        ax2[0].plot(roll_dg, '-o', label=str(weight_list[i]))
+        ax2[1].plot(pitch_dg,'-o', label=str(weight_list[i]))
+        ax2[2].plot(yaw_dg, '-o', label=str(weight_list[i]))
         color = ax2[0].lines[-1].get_color()
         ax3.plot(f_cost, '-o', label=str(weight_list[i])+'rcs_value')
         ax4.plot(radar_detect,'-o', label=str(weight_list[i])+'radar detect')
@@ -185,6 +185,8 @@ if __name__ == '__main__':
     voxel_vals = []
     for k,v in detection_info.items():
         pos = v[1]
+        if pos.x == 11 and pos.y == 90:
+            print(pos.x, pos.y, pos.z)
         voxels.append([pos.x, pos.y, pos.z])
         voxel_vals.append(v[0]) 
 

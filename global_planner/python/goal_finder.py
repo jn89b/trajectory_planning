@@ -23,6 +23,7 @@ From goal location:
         If max range and p_density < p_dens_sum:
             return the array locations 
 
+Need to consider yaw angle of approach too 
             
 """
 
@@ -31,10 +32,10 @@ from src.PositionVector import PositionVector
 
 from src.Raytrace import fast_voxel_algo,  another_fast_voxel
 from src.Obstacle import Obstacle
+from src.MaxPriorityQueue import MaxPriorityQueue
 
 import plotly.graph_objects as go
 import plotly.express as px
-
 
 
 class ApproachGoal():
@@ -66,6 +67,8 @@ class ApproachGoal():
         self.vert_fov_dg_steps = goal_params['vert_fov_dg_steps']
 
         self.detection_info = {}
+
+        self.detection_priority = MaxPriorityQueue()
 
     def compute_lat_max_fov(self):
         """computes the lateral bounds of the radar fov"""
@@ -190,30 +193,44 @@ class ApproachGoal():
                 dist = np.linalg.norm(end_ray_pos.vec - start_ray_pos.vec)
 
                 position_density_vals = []
+                positions = []
                 sum_power_density = 0
                 for br in bearing_rays[15:]:
                     pos = PositionVector(br[0], br[1], br[2])
                     # if pos not in self.detection_info:
                     dist = np.linalg.norm(pos.vec - self.pos.vec)
                     p_density = self.compute_power_density(dist)
-                    print("power density: ", p_density)
+
                     # self.detection_info[pos] = (p_density, pos)
                     sum_power_density += p_density
                     position_density_vals.append((p_density, pos))
+                    positions.append((pos.x, pos.y, pos.z))
+
+                self.detection_priority.push(positions, sum_power_density)
 
                 if sum_power_density <= required_pow_density:
                     continue
                 
                 overall_position_density_vals.append((sum_power_density, 
                                                       position_density_vals))
-                    
-        
-        return overall_position_density_vals
+
+        return overall_position_density_vals, self.detection_priority
 
 
     def compute_power_density(self, target_distance:float) -> float:
         """computes the power density and returns the value"""
         return self.effector_power / (target_distance * 4*np.pi)
+    
+
+    def get_best_approaches(self, num_approaches:int=5) -> list:
+        """returns the n best approaches to the goal location """
+        best_approaches = []
+
+        for i in range(num_approaches+1):
+            best_approaches.append(self.detection_priority.pop_max())
+
+        return best_approaches
+    
 
 if __name__ == '__main__':
     origin_pos = PositionVector(10 , 10 ,10)
@@ -244,8 +261,14 @@ if __name__ == '__main__':
         obs_list.append(some_obstacle)
 
     ag = ApproachGoal(goal_params)
-    detection_info = ag.get_possible_approaches(required_sum_power_density, 
+    detection_info,detection_priority = ag.get_possible_approaches(required_sum_power_density, 
                                                 obs_list)
+    
+
+    best_approaches = ag.get_best_approaches(5)
+
+    highest_value_waypoint = detection_priority.pop_max()
+    print("highest value waypoint: ", highest_value_waypoint)
 
     x_vals = []
     y_vals = []
@@ -319,15 +342,7 @@ if __name__ == '__main__':
         title='Approach Vector to Target'
     )
 
-    
     fig = go.Figure(data=[voxel_data], layout=layout)
     fig.add_trace(origin_data)
     fig.show()
     fig.write_html("effector.html")
-
-
-
-
-    
-    
-    

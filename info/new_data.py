@@ -12,11 +12,16 @@ from -80 to 80 in 10 degree increments
 import pandas as pd
 import numpy as np
 from scipy import interpolate
+# from src.Config.radar_config import RADAR_AIRCRAFT_HASH_FILE
 
+# file_name = 'info/plane_90s_plane_sig.csv' #90 deg
+info_dir = 'info/'
+# filename = 'plane_90s_plane_sig'
+# filename = 'plane_45front_90rear_plane_sig'
+filename = 'plane_45s_plane_sig'
+info_dir = info_dir + filename + '.csv'
 
-file_name = 'info/plane_sig.csv' #90 deg
-
-df = pd.read_csv(file_name, header=None)
+df = pd.read_csv(info_dir, header=None)
 
 yaw_step = 2
 
@@ -58,7 +63,7 @@ for az in azimuths:
 #export this to a csv file
 rcs_hash = pd.DataFrame.from_dict(rcs_vals, orient='index')
 #save to csv
-rcs_hash.to_csv('info/plane_sig_hash.csv')
+rcs_hash.to_csv('info/' + filename + '_hash.csv')
 
 
 

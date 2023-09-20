@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
+import seaborn as sns
+
 from src.PositionVector import PositionVector
 from src.Grid import Grid, FWAgent
 from src.Radar import Radar
 from src.Obstacle import Obstacle
 from src.SparseAstar import SparseAstar
-
 from src.Config.radar_config import RADAR_AIRCRAFT_HASH_FILE
 
 """
@@ -28,10 +29,9 @@ if __name__ == '__main__':
     # load rcs values
     # get pwd and append info/rcs_hash.csv
     pwd = os.getcwd()
-    print(pwd)
-
-    rcs_file = RADAR_AIRCRAFT_HASH_FILE
-    #rcs_file = 'info/rcs_hash.csv' 
+    info_dir = 'info/'
+    save_dir = 'figures/' + RADAR_AIRCRAFT_HASH_FILE
+    rcs_file = info_dir+ RADAR_AIRCRAFT_HASH_FILE + '.csv'
     df = pd.read_csv(rcs_file, header=None)
     #get first column
     rpy_keys = df.iloc[:, 0]
@@ -58,6 +58,7 @@ if __name__ == '__main__':
     obs_positions = [(45, 45, 10),
                      (25, 65, 10),
                      (55, 30, 10)]
+    
     # obs_positions = []
     obs_list = []
     for pos in obs_positions:
@@ -74,7 +75,7 @@ if __name__ == '__main__':
         'azimuth_angle_dg': 45,
         'elevation_angle_dg': 80, #this is wrt to z axis
         'radar_range_m': 80,    
-        'max_fov_dg': 120, 
+        'max_fov_dg': 160, 
         'vert_max_fov_dg': 80,
         'c1': -0.29,
         'c2': 1200,
@@ -141,8 +142,8 @@ if __name__ == '__main__':
 
     #plot start and goal
     ax.plot(start_position.x, start_position.y, 'bo')
-    ax.plot(goal_position.x, goal_position.y, 'bo')
-    
+    ax.plot(goal_position.x,  goal_position.y,  'bo')
+
     # plot with obstacles
     for obs in grid.obstacles:
         obs_image = plt.Circle((obs.position.x, obs.position.y), 
@@ -157,6 +158,19 @@ if __name__ == '__main__':
     
     ax.add_artist(radar_image)
     ax.legend()
+
+    # save plot
+    fig.savefig(save_dir+"path.png")
+    fig2.savefig(save_dir+"path_rpy.png")
+    fig3.savefig(save_dir+"path_rcs.png")
+    fig4.savefig(save_dir+"path_radar.png")
+
+    #save as svg
+    fig.savefig(save_dir+"path.svg")
+    fig2.savefig(save_dir+"path_rpy.svg")
+    fig3.savefig(save_dir+"path_rcs.svg")
+    fig4.savefig(save_dir+"path_radar.svg")
+
 
     #plot radar pixels
     radar_values = []
@@ -190,9 +204,7 @@ if __name__ == '__main__':
         voxels.append([pos.x, pos.y, pos.z])
         voxel_vals.append(v[0]) 
 
-
     voxel_step = 10
-
     voxel_x = []
     voxel_y = []
     voxel_z = []
@@ -231,8 +243,7 @@ if __name__ == '__main__':
     fig.add_trace(voxel_data)
     fig.add_trace(path_data)
     fig.show()
-    fig.write_html("path_traj.html")
-
+    fig.write_html(save_dir+"path.html")
 
 
 

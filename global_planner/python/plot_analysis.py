@@ -31,7 +31,7 @@ class PlotSim():
 
     
     def animate3d(self,sim_data:dict, title_name:str,
-                    save:bool=False) -> None:
+                    save:bool=False, fps:int=5) -> None:
         
         fig = plt.figure()
         # set figsize
@@ -158,7 +158,7 @@ class PlotSim():
         
         #save as gif
         if save == True:
-            ani.save('data_analysis/45s.gif', writer='imagemagick', fps=1)
+            ani.save('data_analysis/45s.gif', writer='imagemagick', fps=fps)
 
         # Show the animation
         plt.show()
@@ -334,7 +334,8 @@ class PlotSim():
         return ax
     
     def animate_single_trajectory(self, sim_data:dict, title_name:str,
-                                  selected_idx:int, save:bool=False) -> None:
+                                  selected_idx:int, save:bool=False,
+                                  fps:int=5) -> None:
         """
         Animate one trajectory in 2d 
         """
@@ -404,7 +405,7 @@ class PlotSim():
                             init_func=init, blit=True, interval=50)
         
         if save == True:
-            ani.save('data_analysis/'+full_title+'.gif', writer='imagemagick', fps=1)
+            ani.save('data_analysis/'+full_title+'.gif', writer='imagemagick', fps=fps)
             print("saving gif")
 
 
@@ -499,7 +500,8 @@ class PlotSim():
             #ax.plot(sum_distance[i], rcs_val, '-o', label=str(sim_data['weights'][i]))
             ax.errorbar(sum_distance[i], mean_prob_detection[i],
                         yerr=std_prob_detection[i], 
-                        label='RCS Weight ' + str(sim_data['weights'][i]), linestyle='None', marker='o')
+                        label='RCS Weight ' + str(sim_data['weights'][i]), 
+                        linestyle='None', marker='o')
         
         #set light grid
         self.set_light_grid(ax)
@@ -516,7 +518,7 @@ class PlotSim():
     
     def animate_rcs_plot(self, df_rcs:pd.DataFrame, sim_data:dict, 
                          title_name:str, sim_idx:int=0,
-                         save:bool=False) -> None:
+                         save:bool=False, fps:int=5) -> None:
         
         """
         Animate the RCS plot 
@@ -596,7 +598,8 @@ class PlotSim():
 
         #save as gif
         if save == True:
-            anim.save('data_analysis/' + title_name + '_rcs.gif', writer='imagemagick', fps=1)
+            anim.save('data_analysis/' + title_name + '_rcs.gif', writer='imagemagick', 
+                      fps=fps)
             print("saving gif")
         plt.show()
 
@@ -666,7 +669,7 @@ if __name__ == '__main__':
     # plotter.plot_prob_detection(sim_data, "45s")
     # plotter.plot_relationship_path_rcs(sim_data, "45s")
 
-    # single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, True)
+    single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, True)
 
     ### PLOT RCS
     df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)

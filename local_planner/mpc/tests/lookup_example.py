@@ -208,7 +208,6 @@ if __name__ == '__main__':
     u_vel = U[0,:]
     u_psi_rate = U[1,:]
     
-
     ## initial parameters 
     #Initiate State parameter
     x0 = opti.parameter(toy_car.n_states)    
@@ -253,7 +252,6 @@ if __name__ == '__main__':
         k4 = f(states + dt_val * k3, controls)
         state_next_RK4 = states + (dt_val / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
         opti.subject_to(X[:, k+1] == state_next_RK4)
-        # opti.subject_to(rcs <= 0.6)
         
     #margin cost function for obstacle avoidance
     safe_cost = opti.variable(N)

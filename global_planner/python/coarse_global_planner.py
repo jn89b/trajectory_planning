@@ -471,8 +471,7 @@ def get_diff_paths(agent:FWAgent, horizon_min_radius_m:float,
     #set seed 
     rand.seed(seed_num)
     for i in range(n_obstacles):
-
-
+        
         obstacle_position = PositionVector()
         obstacle_position.set_position(rand.randint(grid.x_min_m + 150, grid.x_max_m - 200),
                                        rand.randint(grid.y_min_m + 150 ,grid.y_max_m - 300), 0)

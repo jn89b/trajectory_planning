@@ -4,6 +4,7 @@ import pandas as pd
 import os
 
 import seaborn as sns
+import pickle as pkl
 
 from src.PositionVector import PositionVector
 from src.Grid import Grid, FWAgent
@@ -11,6 +12,7 @@ from src.Radar import Radar
 from src.Obstacle import Obstacle
 from src.SparseAstar import SparseAstar
 from src.Config.radar_config import RADAR_AIRCRAFT_HASH_FILE
+from src.DataContainer import SimDataContainer
 
 """
 To do 
@@ -97,6 +99,7 @@ if __name__ == '__main__':
         sparse_astar.clear_sets()
         paths.append(returned_path)
         
+
     # plot for sanity check 
     fig, ax = plt.subplots()
     ax.set_xlim(grid.x_min_m, grid.x_max_m)
@@ -130,6 +133,30 @@ if __name__ == '__main__':
         ax3.plot(f_cost, '-o', label=str(weight_list[i])+'rcs_value')
         ax4.plot(radar_detect,'-o', label=str(weight_list[i])+'radar detect')
 
+    
+    sim_data = SimDataContainer()
+    sim_data.sim_results['paths'] = paths
+    sim_data.sim_results['weights'] = weight_list
+    sim_data.sim_results['radars'] = radars
+
+    rcs_vals = []
+    rcs_probs = []
+    for i, wp_path in enumerate(paths):    
+        rcs_vals.append([x[6] for x in wp_path])
+        rcs_probs.append([x[7] for x in wp_path])
+
+    sim_data.sim_results['rcs_vals'] = rcs_vals
+    sim_data.sim_results['rcs_probs'] = rcs_probs
+    sim_data.sim_results['obstacles'] = obs_list
+    sim_data.sim_results['start_position'] = start_position.vec
+    sim_data.sim_results['goal_position'] = goal_position.vec
+    sim_data.sim_results['grid'] = grid
+    
+
+    pickle_dir = 'data_analysis/' + RADAR_AIRCRAFT_HASH_FILE + '.pkl'
+    sim_data.pickle_data(save_dir + '.pkl')
+
+
     ax2[0].set_title("Roll")
     ax2[1].set_title("Pitch")
     ax2[2].set_title("Yaw")
@@ -155,6 +182,8 @@ if __name__ == '__main__':
     radar_image = plt.Circle((radar_pos.x, radar_pos.y), 
                              radar1.radar_range_m, 
                              color='r', fill=False)
+    
+    ax.plot(radar_pos.x, radar_pos.y, 'ro', label='radar')
     
     ax.add_artist(radar_image)
     ax.legend()

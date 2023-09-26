@@ -298,7 +298,7 @@ class SparseAstar():
                                 norm_rcs = linear_db/linear_max_db
                                 # radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
                                 radar_cost = radar.compute_prob_detect(dist_radar, 
-                                                                        self.rcs_hash[rcs_key])
+                                    self.rcs_hash[rcs_key])
                                 
                                 rcs_val = self.rcs_hash[rcs_key]
 

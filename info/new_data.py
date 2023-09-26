@@ -14,11 +14,12 @@ import numpy as np
 from scipy import interpolate
 # from src.Config.radar_config import RADAR_AIRCRAFT_HASH_FILE
 
-# file_name = 'info/plane_90s_plane_sig.csv' #90 deg
+
 info_dir = 'info/'
-# filename = 'plane_90s_plane_sig'
+# filename = 'plane_sig' #90 deg
+filename = 'plane_90s_plane_sig'
 # filename = 'plane_45front_90rear_plane_sig'
-filename = 'plane_45s_plane_sig'
+# filename = 'plane_45s_plane_sig'
 info_dir = info_dir + filename + '.csv'
 
 df = pd.read_csv(info_dir, header=None)
@@ -53,12 +54,21 @@ azimuths = np.arange(0, 360+1, 1)
 
 
 rcs_vals = {}
+casadi_table = []
 for az in azimuths:
+    az_row = []
     for ele in elevations:
+        rcs_val = interp_func(az, ele)
+        az_row.append(rcs_val[0])
         key = f"{az}_{ele}"
-        rcs_vals[key] = interp_func(az, ele)
+        rcs_vals[key] = rcs_val[0]
         print(key, rcs_vals[key])
 
+    casadi_table.append(az_row)
+
+
+rcs_table = pd.DataFrame(casadi_table)
+rcs_table.to_csv('info/' + filename + '_mpc_table.csv')
 
 #export this to a csv file
 rcs_hash = pd.DataFrame.from_dict(rcs_vals, orient='index')

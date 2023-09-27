@@ -5,3 +5,6 @@ CMakeFiles/
 global_planner/build/
 global_planner/CMakeFiles/
 global_planner/_deps/
+
+*.pickle
+*.pkl

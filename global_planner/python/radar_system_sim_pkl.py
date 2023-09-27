@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import pickle as pkl
 
 from src.PositionVector import PositionVector
 from src.Grid import Grid, FWAgent
@@ -95,6 +96,13 @@ def get_visual_scatter_radar(radar_info:dict):
 
     return voxel_visualizer
 
+pickle_plot_counter = 1
+def pickle_plot(save_data):
+    global pickle_plot_counter
+    with open('radar_data'+str(pickle_plot_counter)+'.pickle', 'wb') as file:
+        pkl.dump(save_data, file)
+    pickle_plot_counter = pickle_plot_counter + 1
+
 
 if __name__ == '__main__':
 
@@ -123,9 +131,46 @@ if __name__ == '__main__':
         # obs_list.append(some_obstacle)
         grid.insert_obstacles(some_obstacle)
 
-    detection_info = radar.compute_fov_cells_3d(grid.obstacles)
-    
-    detect = detection_info.items()
+    # Set radar params
+    radar_pos = PositionVector(50, 0, 0)
+    radar_params = {
+        'pos': radar_pos,
+        'azimuth_angle_dg': 30,
+        'elevation_angle_dg': 80, #this is wrt to z axis
+        'radar_range_m': 30,
+        'max_fov_dg': 120, 
+        'vert_max_fov_dg': 80,
+        'c1': -0.29,
+        'c2': 1200,
+        'radar_fq_hz': 10000,
+        'grid': grid
+    }
+
+    radar_pos2 = PositionVector(-50, 0, 0)
+    radar_params2 = {
+        'pos': radar_pos2,
+        'azimuth_angle_dg': 100,
+        'elevation_angle_dg': 80, #this is wrt to z axis
+        'radar_range_m': 30,    
+        'max_fov_dg': 120, 
+        'vert_max_fov_dg': 80,
+        'c1': -0.29,
+        'c2': 1200,
+        'radar_fq_hz': 10000,
+        'grid': grid
+    }
+
+    # INITIALIZE RADAR INSTANCES FROM RADAR CLASS
+    radar1 = Radar(radar_params)
+    radar2 = Radar(radar_params2)
+    radars = [radar1, radar2]
+
+    pickle_plot(radars)
+
+    detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
+    detection_info2 = radar2.compute_fov_cells_3d(grid.obstacles)
+
+    detect = [detection_info.items(), detection_info2.items()]
 
     plt.show()
 
@@ -139,6 +184,9 @@ if __name__ == '__main__':
         data_vis = get_visual_scatter_radar(data_info)
         visualizer_list.append(data_vis)
         fig.add_trace(data_vis)
+        # pickle_plot(data_info)
+
+
 
     fig.show()
     fig.write_html("path_traj.html")

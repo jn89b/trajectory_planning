@@ -16,7 +16,7 @@ Should only be about 3mb
 """
 
 # enter parameters here
-file_name = 'info/sig_mat_45front_90rear.csv' #90 deg
+file_name = 'info/sig_mat_45front_90rear_noseONzero.csv' #90 deg
 #no colunm names
 df = pd.read_csv(file_name, header=None)
 
@@ -58,10 +58,9 @@ roll_list = np.arange(min_roll, max_roll+1, roll_step)
 pitch_loop = np.arange(min_pitch, max_pitch+1, 1)
 roll_loop = np.arange(min_roll, max_roll+1, 1)
 
+
+
 for yaw,pitch_roll_array in yaw_dict.items():
-    #loop though yaw keys and get array
-    # print(pitch_roll_array.shape)
-    #loop through array and get pitch and roll values
 
     # Create a 2D interpolation function
     interp_func = interpolate.interp2d(pitch_list, roll_list, 
@@ -86,7 +85,7 @@ for yaw,pitch_roll_array in yaw_dict.items():
 #export this to a csv file
 rcs_hash = pd.DataFrame.from_dict(rcs_angles, orient='index')
 #save to csv
-rcs_hash.to_csv('info/sig_mat_45front_90rear_hash.csv')
+rcs_hash.to_csv('info/sig_mat_45front_90rear_noseONzero_hash.csv')
 
 # goal is to generate a hash table for each yaw angle 
 # something like this 

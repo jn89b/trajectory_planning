@@ -3,11 +3,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
+import seaborn as sns
+import pickle as pkl
+
 from src.PositionVector import PositionVector
 from src.Grid import Grid, FWAgent
 from src.Radar import Radar
 from src.Obstacle import Obstacle
 from src.SparseAstar import SparseAstar
+from src.Config.radar_config import RADAR_AIRCRAFT_HASH_FILE
+from src.DataContainer import SimDataContainer
 
 """
 To do 
@@ -26,10 +31,9 @@ if __name__ == '__main__':
     # load rcs values
     # get pwd and append info/rcs_hash.csv
     pwd = os.getcwd()
-    print(pwd)
-
-    rcs_file = 'info/sig_mat_45front_90rear_hash.csv'
-    # rcs_file = 'info/rcs_hash.csv'
+    info_dir = 'info/'
+    save_dir = 'figures/' + RADAR_AIRCRAFT_HASH_FILE
+    rcs_file = info_dir+ RADAR_AIRCRAFT_HASH_FILE + '.csv'
     df = pd.read_csv(rcs_file, header=None)
     #get first column
     rpy_keys = df.iloc[:, 0]
@@ -41,8 +45,8 @@ if __name__ == '__main__':
     rcs_hash = dict(zip(rpy_keys, rcs_vals))
 
     ## create agent
-    start_position = PositionVector(50,15,5)
-    goal_position = PositionVector(10,80,5)
+    start_position = PositionVector(50,5,5)
+    goal_position = PositionVector(10,90,5)
     fw_agent_psi_dg = 90
     fw_agent = FWAgent(start_position, 0, fw_agent_psi_dg)
     fw_agent.vehicle_constraints(horizontal_min_radius_m=60, 
@@ -57,22 +61,23 @@ if __name__ == '__main__':
                      (25, 65, 10),
                      (55, 30, 10)]
     
-    # obs_list = []
+    # obs_positions = []
+    obs_list = []
     for pos in obs_positions:
         obs_position = PositionVector(pos[0], pos[1], pos[2])
         radius_obs_m = 5
         some_obstacle = Obstacle(obs_position, radius_obs_m)
-        # obs_list.append(some_obstacle)
+        obs_list.append(some_obstacle)
         grid.insert_obstacles(some_obstacle)
 
     # Set radar params
     radar_pos = PositionVector(15, 15, 0)
     radar_params = {
         'pos': radar_pos,
-        'azimuth_angle_dg': 55,
+        'azimuth_angle_dg': 45,
         'elevation_angle_dg': 80, #this is wrt to z axis
         'radar_range_m': 80,    
-        'max_fov_dg': 120, 
+        'max_fov_dg': 160, 
         'vert_max_fov_dg': 80,
         'c1': -0.29,
         'c2': 1200,
@@ -84,7 +89,7 @@ if __name__ == '__main__':
     detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
     radars = [radar1]
     
-    weight_list = [0, 10, 20, 50]
+    weight_list = [0, 5, 10, 15]
     paths = []
     for weight in weight_list:
         sparse_astar = SparseAstar(grid, 2, True, rcs_hash, radars, weight, max_rcs_val)
@@ -94,6 +99,7 @@ if __name__ == '__main__':
         sparse_astar.clear_sets()
         paths.append(returned_path)
         
+
     # plot for sanity check 
     fig, ax = plt.subplots()
     ax.set_xlim(grid.x_min_m, grid.x_max_m)
@@ -120,12 +126,36 @@ if __name__ == '__main__':
 
         ax.plot(path_x, path_y, '-o', label=str(weight_list[i]))
         
-        ax2[0].plot(roll_dg, label=str(weight_list[i]))
-        ax2[1].plot(pitch_dg, label=str(weight_list[i]))
-        ax2[2].plot(yaw_dg, label=str(weight_list[i]))
+        ax2[0].plot(roll_dg, '-o', label=str(weight_list[i]))
+        ax2[1].plot(pitch_dg,'-o', label=str(weight_list[i]))
+        ax2[2].plot(yaw_dg, '-o', label=str(weight_list[i]))
         color = ax2[0].lines[-1].get_color()
         ax3.plot(f_cost, '-o', label=str(weight_list[i])+'rcs_value')
         ax4.plot(radar_detect,'-o', label=str(weight_list[i])+'radar detect')
+
+    
+    sim_data = SimDataContainer()
+    sim_data.sim_results['paths'] = paths
+    sim_data.sim_results['weights'] = weight_list
+    sim_data.sim_results['radars'] = radars
+
+    rcs_vals = []
+    rcs_probs = []
+    for i, wp_path in enumerate(paths):    
+        rcs_vals.append([x[6] for x in wp_path])
+        rcs_probs.append([x[7] for x in wp_path])
+
+    sim_data.sim_results['rcs_vals'] = rcs_vals
+    sim_data.sim_results['rcs_probs'] = rcs_probs
+    sim_data.sim_results['obstacles'] = obs_list
+    sim_data.sim_results['start_position'] = start_position.vec
+    sim_data.sim_results['goal_position'] = goal_position.vec
+    sim_data.sim_results['grid'] = grid
+    
+
+    pickle_dir = 'data_analysis/' + RADAR_AIRCRAFT_HASH_FILE + '.pkl'
+    sim_data.pickle_data(save_dir + '.pkl')
+
 
     ax2[0].set_title("Roll")
     ax2[1].set_title("Pitch")
@@ -137,11 +167,10 @@ if __name__ == '__main__':
     ax4.set_ylabel("Radar Detection")
     ax4.legend()
 
-
     #plot start and goal
     ax.plot(start_position.x, start_position.y, 'bo')
-    ax.plot(goal_position.x, goal_position.y, 'bo')
-    
+    ax.plot(goal_position.x,  goal_position.y,  'bo')
+
     # plot with obstacles
     for obs in grid.obstacles:
         obs_image = plt.Circle((obs.position.x, obs.position.y), 
@@ -154,8 +183,23 @@ if __name__ == '__main__':
                              radar1.radar_range_m, 
                              color='r', fill=False)
     
+    ax.plot(radar_pos.x, radar_pos.y, 'ro', label='radar')
+    
     ax.add_artist(radar_image)
     ax.legend()
+
+    # save plot
+    fig.savefig(save_dir+"path.png")
+    fig2.savefig(save_dir+"path_rpy.png")
+    fig3.savefig(save_dir+"path_rcs.png")
+    fig4.savefig(save_dir+"path_radar.png")
+
+    #save as svg
+    fig.savefig(save_dir+"path.svg")
+    fig2.savefig(save_dir+"path_rpy.svg")
+    fig3.savefig(save_dir+"path_rcs.svg")
+    fig4.savefig(save_dir+"path_radar.svg")
+
 
     #plot radar pixels
     radar_values = []
@@ -184,12 +228,12 @@ if __name__ == '__main__':
     voxel_vals = []
     for k,v in detection_info.items():
         pos = v[1]
+        if pos.x == 11 and pos.y == 90:
+            print(pos.x, pos.y, pos.z)
         voxels.append([pos.x, pos.y, pos.z])
         voxel_vals.append(v[0]) 
 
-
     voxel_step = 10
-
     voxel_x = []
     voxel_y = []
     voxel_z = []
@@ -198,10 +242,6 @@ if __name__ == '__main__':
             voxel_x.append(voxel[0])
             voxel_y.append(voxel[1])
             voxel_z.append(voxel[2])
-
-    # voxel_x = [x[0] for x in voxels]
-    # voxel_y = [x[1] for x in voxels]
-    # voxel_z = [x[2] for x in voxels]
 
     voxel_data = go.Scatter3d(
         x=voxel_x,
@@ -232,8 +272,7 @@ if __name__ == '__main__':
     fig.add_trace(voxel_data)
     fig.add_trace(path_data)
     fig.show()
-    fig.write_html("path_traj.html")
-
+    fig.write_html(save_dir+"path.html")
 
 
 

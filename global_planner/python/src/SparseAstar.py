@@ -259,6 +259,7 @@ class SparseAstar():
                 if self.use_radar:
                     radar_cost = 0
                     rcs_val = -100
+                    radar_probs = []
                     for radar in self.radars:
                         idx_pos = self.grid.convert_position_to_index(neighbor.position)
                         #get radar value
@@ -301,8 +302,10 @@ class SparseAstar():
                                     self.rcs_hash[rcs_key])
                                 
                                 rcs_val = self.rcs_hash[rcs_key]
+                                radar_probs.append(radar_cost)
 
                         else:
+
                             #Need to fix voxel detections this is a hacky way to fix it
                             z_vals = [0, 1, -1, 2, -2]
                             y_vals = [0, 1, -1, 2, -2]
@@ -328,6 +331,9 @@ class SparseAstar():
                                         radar_cost = radar.compute_prob_detect(dist_radar, 
                                                                                 self.rcs_hash[rcs_key])
                                         rcs_val = self.rcs_hash[rcs_key]
+
+                                        radar_probs.append(radar_cost)
+
                                         break
 
                             for x,y in zip(x_vals, y_vals):
@@ -352,8 +358,18 @@ class SparseAstar():
                                         radar_cost = radar.compute_prob_detect(dist_radar, 
                                                                                 self.rcs_hash[rcs_key])
                                         rcs_val = self.rcs_hash[rcs_key]
+                            
+                                        radar_probs.append(radar_cost)
                                         break
-                                    
+                
+                if len(radar_probs) > 1:
+                    radar_cost = (1 - np.prod(1 - np.array(radar_probs))) #*np.sqrt(len(radar_probs))
+                    # continue
+                elif len(radar_probs) == 1:
+                    radar_cost = radar_probs[0]
+                else:
+                    radar_cost = 0
+
                 neighbor.g = current_node.g + 1
                 neighbor.rcs_value = rcs_val
                 neighbor.radar_detection = radar_cost

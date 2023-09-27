@@ -26,6 +26,9 @@ Have some obstacles placed within range
 import plotly.graph_objects as go
 import plotly.express as px
 
+sns.set_palette("colorblind")
+
+
 if __name__ == '__main__':
 
     # load rcs values
@@ -45,8 +48,9 @@ if __name__ == '__main__':
     rcs_hash = dict(zip(rpy_keys, rcs_vals))
 
     ## create agent
-    start_position = PositionVector(50,5,5)
-    goal_position = PositionVector(10,90,5)
+    
+    start_position = PositionVector(10,60,5)
+    goal_position = PositionVector(90,60)
     fw_agent_psi_dg = 90
     fw_agent = FWAgent(start_position, 0, fw_agent_psi_dg)
     fw_agent.vehicle_constraints(horizontal_min_radius_m=60, 
@@ -57,11 +61,12 @@ if __name__ == '__main__':
 
     ## create grid
     grid = Grid(fw_agent, 100, 100, 100, 5, 5, 0)
-    obs_positions = [(45, 45, 10),
-                     (25, 65, 10),
-                     (55, 30, 10)]
+    # obs_positions = [(45, 45, 10),
+    #                  (25, 65, 10),
+    #                  (55, 30, 10)]  
     
-    # obs_positions = []
+    obs_positions = [(40,60,10)]
+    obs_positions = []
     obs_list = []
     for pos in obs_positions:
         obs_position = PositionVector(pos[0], pos[1], pos[2])
@@ -84,10 +89,28 @@ if __name__ == '__main__':
         'radar_fq_hz': 10000,
         'grid': grid
     }
-
     radar1 = Radar(radar_params)
     detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
-    radars = [radar1]
+    
+    radar_pos2 = PositionVector(70, 15, 0)
+
+    radar_params = {
+        'pos': radar_pos2,
+        'azimuth_angle_dg': 135,
+        'elevation_angle_dg': 80, #this is wrt to z axis
+        'radar_range_m': 80,    
+        'max_fov_dg': 160, 
+        'vert_max_fov_dg': 80,
+        'c1': -0.29,
+        'c2': 1200,
+        'radar_fq_hz': 10000,
+        'grid': grid
+    }
+    
+    radar2 = Radar(radar_params)
+    detection_info2 = radar2.compute_fov_cells_3d(grid.obstacles)
+
+    radars = [radar1, radar2]
     
     weight_list = [0, 5, 10, 15]
     paths = []
@@ -102,8 +125,8 @@ if __name__ == '__main__':
 
     # plot for sanity check 
     fig, ax = plt.subplots()
-    ax.set_xlim(grid.x_min_m, grid.x_max_m)
-    ax.set_ylim(grid.y_min_m, grid.y_max_m)
+    ax.set_xlim(grid.x_min_m-20, grid.x_max_m+20)
+    ax.set_ylim(grid.y_min_m-20, grid.y_max_m+20)
 
     # make a subplot with 3 rows
     fig2,ax2 = plt.subplots(3,1)
@@ -178,12 +201,37 @@ if __name__ == '__main__':
                                color='k', fill=False)
         ax.add_artist(obs_image)
     
-    # plot radar fov
-    radar_image = plt.Circle((radar_pos.x, radar_pos.y), 
-                             radar1.radar_range_m, 
-                             color='r', fill=False)
-    
-    ax.plot(radar_pos.x, radar_pos.y, 'ro', label='radar')
+    for ra in radars:
+
+        # plot radar fov
+        radar_image = plt.Circle((ra.pos.x, ra.pos.y), 
+                                radar1.radar_range_m, 
+                                color='r', fill=False)
+        
+        ax.plot(ra.pos.x, ra.pos.y, 'ro', label='radar')
+
+        #plot radar pixels
+        radar_values = []
+        voxel_positions = set()
+        for k,v in ra.detection_info.items():
+            value = v[0]
+            pos = v[1]
+            if (pos.x, pos.y) in voxel_positions:
+                continue
+
+            voxel_positions.add((pos.x, pos.y))
+            radar_values.append(value)
+            
+        #set color map
+        for pos in voxel_positions:
+            voxel_image = plt.Rectangle((pos[0], pos[1]),
+                                        1, 1, 
+                                        color='red', fill=False,
+                                        alpha=0.1)
+            
+            ax.add_artist(voxel_image)
+        
+        
     
     ax.add_artist(radar_image)
     ax.legend()
@@ -200,27 +248,6 @@ if __name__ == '__main__':
     fig3.savefig(save_dir+"path_rcs.svg")
     fig4.savefig(save_dir+"path_radar.svg")
 
-
-    #plot radar pixels
-    radar_values = []
-    voxel_positions = set()
-    for k,v in detection_info.items():
-        value = v[0]
-        pos = v[1]
-        if (pos.x, pos.y) in voxel_positions:
-            continue
-
-        voxel_positions.add((pos.x, pos.y))
-        radar_values.append(value)
-        
-    #set color map
-    for pos in voxel_positions:
-        voxel_image = plt.Rectangle((pos[0], pos[1]),
-                                    1, 1, 
-                                    color='red', fill=False,
-                                    alpha=0.1)
-        
-        ax.add_artist(voxel_image)
 
     plt.show()    
 

@@ -186,7 +186,5 @@ if __name__ == '__main__':
         fig.add_trace(data_vis)
         # pickle_plot(data_info)
 
-
-
     fig.show()
     fig.write_html("path_traj.html")

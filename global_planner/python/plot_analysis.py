@@ -570,7 +570,7 @@ class PlotSim():
         dx_wp = [x[0] - radar_pos[0] for x in paths]
         dy_wp = [x[1] - radar_pos[1] for x in paths]
         rel_psi_dg = np.arctan2(dy_wp, dx_wp) * 180 / np.pi
-        rel_psi_dg = rel_psi_dg + 180
+        rel_psi_dg = rel_psi_dg + 90 
         
 
         for dg in rel_psi_dg:
@@ -664,24 +664,24 @@ if __name__ == '__main__':
     plotter = PlotSim()
     # rcs_plot = plotter.plot_rcs(sim_data, "45s")
     # rcs_detection_plot = plotter.plot_relationship_path_pdetection(sim_data, "45s", True)
-    trajectory_plot_3d = plotter.plot3d(sim_data, "45s", True)
-    trajectory_plot_2d = plotter.plot2d(sim_data, "45s", True)
+    # trajectory_plot_3d = plotter.plot3d(sim_data, "45s", False)
+    # trajectory_plot_2d = plotter.plot2d(sim_data, "45s", False)
     
     # plt.show()
 
-    # plotter.animate3d(sim_data, "45s", True)
+    # plotter.animate3d(sim_data, "45s", False)
     # plotter.plot_sum_rcs(sim_data, "45s")
     # plotter.plot_prob_detection(sim_data, "45s")
     # plotter.plot_relationship_path_rcs(sim_data, "45s")
 
-    # single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, True)
+    # single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, False)
 
     # ### PLOT RCS
-    # df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
-    # # # fig, ax = get_spider_plot(df, "45s")
-    # # # plt.show()
-    # plotter.animate_rcs_plot(df_45, sim_data, "45s",0, True)
-    # plt.show()
+    df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
+    # # fig, ax = get_spider_plot(df, "45s")
+    # # plt.show()
+    plotter.animate_rcs_plot(df_45, sim_data, "45s",0, False)
+    plt.show()
 
 #%% Animate the closed set stuff
 

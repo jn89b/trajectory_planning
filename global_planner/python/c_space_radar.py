@@ -66,7 +66,6 @@ if __name__ == '__main__':
     #                  (55, 30, 10)]  
     
     obs_positions = [(40,60,10)]
-    obs_positions = []
     obs_list = []
     for pos in obs_positions:
         obs_position = PositionVector(pos[0], pos[1], pos[2])
@@ -201,12 +200,13 @@ if __name__ == '__main__':
                                color='k', fill=False)
         ax.add_artist(obs_image)
     
-    for ra in radars:
+    for i, ra in enumerate(radars):
 
         # plot radar fov
+        colors = ['r', 'gray']
         radar_image = plt.Circle((ra.pos.x, ra.pos.y), 
                                 radar1.radar_range_m, 
-                                color='r', fill=False)
+                                color=colors[i], fill=False)
         
         ax.plot(ra.pos.x, ra.pos.y, 'ro', label='radar')
 
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         for pos in voxel_positions:
             voxel_image = plt.Rectangle((pos[0], pos[1]),
                                         1, 1, 
-                                        color='red', fill=False,
+                                        color=colors[i], fill=False,
                                         alpha=0.1)
             
             ax.add_artist(voxel_image)

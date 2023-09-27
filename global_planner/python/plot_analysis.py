@@ -328,6 +328,11 @@ class PlotSim():
         #set aspect ratio equal
         ax.aspect = 'equal'
         ax.view_init(azim=50, elev=-148)
+        
+        if save == True:
+            fig.savefig('data_analysis/' + title_name + '_3d.png')
+            #save as svg
+            fig.savefig('data_analysis/' + title_name + '_3d.svg')
 
         plt.show()
 
@@ -659,8 +664,8 @@ if __name__ == '__main__':
     plotter = PlotSim()
     # rcs_plot = plotter.plot_rcs(sim_data, "45s")
     # rcs_detection_plot = plotter.plot_relationship_path_pdetection(sim_data, "45s", True)
-    # trajectory_plot_3d = plotter.plot3d(sim_data, "45s")
-    # trajectory_plot_2d = plotter.plot2d(sim_data, "45s")
+    trajectory_plot_3d = plotter.plot3d(sim_data, "45s", True)
+    trajectory_plot_2d = plotter.plot2d(sim_data, "45s", True)
     
     # plt.show()
 
@@ -669,14 +674,14 @@ if __name__ == '__main__':
     # plotter.plot_prob_detection(sim_data, "45s")
     # plotter.plot_relationship_path_rcs(sim_data, "45s")
 
-    single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, True)
+    # single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, True)
 
-    ### PLOT RCS
-    df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
-    # # fig, ax = get_spider_plot(df, "45s")
-    # # plt.show()
-    plotter.animate_rcs_plot(df_45, sim_data, "45s",0, True)
-    plt.show()
+    # ### PLOT RCS
+    # df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
+    # # # fig, ax = get_spider_plot(df, "45s")
+    # # # plt.show()
+    # plotter.animate_rcs_plot(df_45, sim_data, "45s",0, True)
+    # plt.show()
 
 #%% Animate the closed set stuff
 

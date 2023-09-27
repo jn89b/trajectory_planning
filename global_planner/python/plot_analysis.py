@@ -617,7 +617,7 @@ def get_spider_plot(df_rcs:pd.DataFrame, title_name:str):
     plt.figure(figsize=(8, 6))
     fig = plt.figure()
     ax = plt.subplot(111, polar=True)
-
+    ax.set_ylim(-100, 0)
     # Plot the data as a spider plot    
     ax.plot(angles * np.pi / 180, rcs_vals, 'b', linewidth=1)
     ax.fill(angles * np.pi / 180, rcs_vals, 'b', alpha=0.1)
@@ -627,6 +627,7 @@ def get_spider_plot(df_rcs:pd.DataFrame, title_name:str):
 
     #set north to 0 degrees
     ax.set_theta_zero_location("N")
+
 
     return fig, ax
 

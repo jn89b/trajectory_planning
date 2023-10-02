@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # load rcs values
     # get pwd and append info/rcs_hash.csv
     pwd = os.getcwd()
-    info_dir = 'info/'
+    info_dir = 'info/hash/'
     save_dir = 'figures/' + RADAR_AIRCRAFT_HASH_FILE
     rcs_file = info_dir+ RADAR_AIRCRAFT_HASH_FILE + '.csv'
     df = pd.read_csv(rcs_file, header=None)
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     fw_agent.set_goal_state(goal_position)
 
     ## create grid
-    grid = Grid(fw_agent, 100, 100, 100, 5, 5, 0)
+    grid = Grid(fw_agent, 110, 110, 100, 5, 5, 0)
     # obs_positions = [(45, 45, 10),
     #                  (25, 65, 10),
     #                  (55, 30, 10)]  

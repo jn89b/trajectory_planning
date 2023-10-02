@@ -107,9 +107,6 @@ class NettedRadarSys():
 with open ('radar_params_obs.pickle', 'rb' ) as file:
     radars_controlled = pkl.load(file)
 
-# with open ('radar_cells.pickle', 'rb' ) as file:
-#     radar_cells = pkl.load(file)
-
 for radar in radars_controlled:
     print(radar.c1)
     print(radar.pos.vec)

@@ -17,9 +17,9 @@ from scipy import interpolate
 
 info_dir = 'info/'
 # filename = 'plane_sig' #90 deg
-filename = 'plane_90s_plane_sig'
+# filename = 'plane_90s_plane_sig'
 # filename = 'plane_45front_90rear_plane_sig'
-# filename = 'plane_45s_plane_sig'
+filename = 'plane_45s_plane_sig'
 info_dir = info_dir + filename + '.csv'
 
 df = pd.read_csv(info_dir, header=None)
@@ -73,7 +73,7 @@ rcs_table.to_csv('info/' + filename + '_mpc_table.csv')
 #export this to a csv file
 rcs_hash = pd.DataFrame.from_dict(rcs_vals, orient='index')
 #save to csv
-rcs_hash.to_csv('info/' + filename + '_hash.csv')
+rcs_hash.to_csv('info/hash/' + filename + '_hash.csv')
 
 
 

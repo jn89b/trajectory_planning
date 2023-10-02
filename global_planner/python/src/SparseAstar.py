@@ -260,6 +260,7 @@ class SparseAstar():
                     radar_cost = 0
                     rcs_val = -100
                     radar_probs = []
+                    ## Need to reclass this to radar system
                     for radar in self.radars:
                         idx_pos = self.grid.convert_position_to_index(neighbor.position)
                         #get radar value
@@ -305,6 +306,7 @@ class SparseAstar():
                                 radar_probs.append(radar_cost)
 
                         else:
+
 
                             #Need to fix voxel detections this is a hacky way to fix it
                             z_vals = [0, 1, -1, 2, -2]
@@ -377,6 +379,5 @@ class SparseAstar():
                 neighbor.h = (self.compute_distance(neighbor, self.goal_node))
                 neighbor.f = neighbor.g +  neighbor.h + neighbor.radar_cost
                 self.open_set.put((neighbor.f, neighbor))
-
 
         return self.return_path(current_node)

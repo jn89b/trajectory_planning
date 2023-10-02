@@ -661,7 +661,6 @@ if __name__ == '__main__':
     sim_data = pkl.load(open('data_analysis/plane_45s_plane_sig_hash.pkl', 'rb'))
 
 #%% Plot the trajectories and results
-
     plotter = PlotSim()
     # rcs_plot = plotter.plot_rcs(sim_data, "45s")
     # rcs_detection_plot = plotter.plot_relationship_path_pdetection(sim_data, "45s", True)

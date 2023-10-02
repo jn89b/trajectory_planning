@@ -25,14 +25,27 @@ Have some obstacles placed within range
 
 import plotly.graph_objects as go
 import plotly.express as px
+import pickle as pkl
+
 
 sns.set_palette("colorblind")
+
+def load_pickle():
+    """
+    pass
+    """
+    with open('radar_params_obs.pickle', 'rb') as file:
+        loaded_data = pkl.load(file)
+
+    return loaded_data
 
 
 if __name__ == '__main__':
 
     # load rcs values
     # get pwd and append info/rcs_hash.csv
+    USE_SAVED_RADARS = True
+    
     pwd = os.getcwd()
     info_dir = 'info/hash/'
     save_dir = 'figures/' + RADAR_AIRCRAFT_HASH_FILE
@@ -60,7 +73,7 @@ if __name__ == '__main__':
     fw_agent.set_goal_state(goal_position)
 
     ## create grid
-    grid = Grid(fw_agent, 110, 110, 100, 5, 5, 0)
+    grid = Grid(fw_agent, 120, 120, 100, 5, 5, 0)
     # obs_positions = [(45, 45, 10),
     #                  (25, 65, 10),
     #                  (55, 30, 10)]  
@@ -74,43 +87,44 @@ if __name__ == '__main__':
         obs_list.append(some_obstacle)
         grid.insert_obstacles(some_obstacle)
 
-    # Set radar params
-    radar_pos = PositionVector(15, 15, 0)
-    radar_params = {
-        'pos': radar_pos,
-        'azimuth_angle_dg': 45,
-        'elevation_angle_dg': 80, #this is wrt to z axis
-        'radar_range_m': 80,    
-        'max_fov_dg': 160, 
-        'vert_max_fov_dg': 80,
-        'c1': -0.29,
-        'c2': 1200,
-        'radar_fq_hz': 10000,
-        'grid': grid
-    }
-    radar1 = Radar(radar_params)
-    detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
-    
-    radar_pos2 = PositionVector(70, 15, 0)
 
-    radar_params = {
-        'pos': radar_pos2,
-        'azimuth_angle_dg': 135,
-        'elevation_angle_dg': 80, #this is wrt to z axis
-        'radar_range_m': 80,    
-        'max_fov_dg': 160, 
-        'vert_max_fov_dg': 80,
-        'c1': -0.29,
-        'c2': 1200,
-        'radar_fq_hz': 10000,
-        'grid': grid
-    }
-    
-    radar2 = Radar(radar_params)
-    detection_info2 = radar2.compute_fov_cells_3d(grid.obstacles)
+    if USE_SAVED_RADARS  == True:
+        radars = load_pickle()
+    else:
+        # Set radar params
+        radar_pos = PositionVector(15, 15, 0)
+        radar_params = {
+            'pos': radar_pos,
+            'azimuth_angle_dg': 45,
+            'elevation_angle_dg': 80, #this is wrt to z axis
+            'radar_range_m': 80,    
+            'max_fov_dg': 160, 
+            'vert_max_fov_dg': 80,
+            'c1': -0.29,
+            'c2': 1200,
+            'radar_fq_hz': 10000,
+            'grid': grid
+        }
+        radar1 = Radar(radar_params)
+        detection_info = radar1.compute_fov_cells_3d(grid.obstacles)
+        radar_pos2 = PositionVector(70, 15, 0)
+        radar_params = {
+            'pos': radar_pos2,
+            'azimuth_angle_dg': 135,
+            'elevation_angle_dg': 80, #this is wrt to z axis
+            'radar_range_m': 80,    
+            'max_fov_dg': 160, 
+            'vert_max_fov_dg': 80,
+            'c1': -0.29,
+            'c2': 1200,
+            'radar_fq_hz': 10000,
+            'grid': grid
+        }
+        radar2 = Radar(radar_params)
+        detection_info2 = radar2.compute_fov_cells_3d(grid.obstacles)
+        radars = [radar1, radar2]
 
-    radars = [radar1, radar2]
-    
+
     weight_list = [0, 5, 10, 15]
     paths = []
     for weight in weight_list:
@@ -205,7 +219,7 @@ if __name__ == '__main__':
         # plot radar fov
         colors = ['r', 'gray']
         radar_image = plt.Circle((ra.pos.x, ra.pos.y), 
-                                radar1.radar_range_m, 
+                                ra.radar_range_m, 
                                 color=colors[i], fill=False)
         
         ax.plot(ra.pos.x, ra.pos.y, 'ro', label='radar')

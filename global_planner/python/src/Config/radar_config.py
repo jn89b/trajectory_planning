@@ -12,6 +12,6 @@ radar_inputs = {
 }
 
 #RADAR_AIRCRAFT_HASH_FILE = 'plane_sig_hash'
-#RADAR_AIRCRAFT_HASH_FILE = 'plane_90s_plane_sig_hash'
+RADAR_AIRCRAFT_HASH_FILE = 'plane_90s_plane_sig_hash'
 # RADAR_AIRCRAFT_HASH_FILE = 'plane_45front_90rear_plane_sig_hash'
 # RADAR_AIRCRAFT_HASH_FILE = 'plane_45s_plane_sig_hash'

@@ -522,7 +522,7 @@ class PlotSim():
         return ax
     
     def animate_rcs_plot(self, df_rcs:pd.DataFrame, sim_data:dict, 
-                         title_name:str, sim_idx:int=0,
+                         title_name:str, weight_idx:int=0,
                          save:bool=False, fps:int=5) -> None:
         
         """
@@ -566,7 +566,7 @@ class PlotSim():
         # need to find the rcs values for each angle
         rcs_sim_vals = []
         rcs_theta_vals = []
-        paths = sim_data['paths'][sim_idx]
+        paths = sim_data['paths'][weight_idx]
         dx_wp = [x[0] - radar_pos[0] for x in paths]
         dy_wp = [x[1] - radar_pos[1] for x in paths]
         rel_psi_dg = np.arctan2(dy_wp, dx_wp) * 180 / np.pi
@@ -640,10 +640,19 @@ def compute_sum_rcs(sim_data:dict):
 def compute_sum_distance(sim_data:dict):
     sum_distance = []
     for i,path in enumerate(sim_data['paths']):
-        x_wp = [x[0] - sim_data['start_position'][0] for x in path] 
-        y_wp = [x[1] - sim_data['start_position'][1] for x in path]
-        z_wp = [x[2] - sim_data['start_position'][2]for x in path]
-        sum_distance.append(sum(x_wp) + sum(y_wp) + sum(z_wp))
+        #compute total distance traveled
+        x_wp = [x[0] for x in path]
+        y_wp = [x[1] for x in path]
+        z_wp = [x[2] for x in path]
+
+        dist = 0
+        for j in range(len(x_wp)-1):
+            dx = x_wp[j+1] - x_wp[j]
+            dy = y_wp[j+1] - y_wp[j]
+            dz = z_wp[j+1] - z_wp[j]
+            dist += np.sqrt(dx**2 + dy**2 + dz**2)
+
+        sum_distance.append(dist)
 
     print("sum distance", sum_distance)
     return sum_distance
@@ -663,7 +672,7 @@ if __name__ == '__main__':
 #%% Plot the trajectories and results
     plotter = PlotSim()
     # rcs_plot = plotter.plot_rcs(sim_data, "45s")
-    # rcs_detection_plot = plotter.plot_relationship_path_pdetection(sim_data, "45s", True)
+    rcs_detection_plot = plotter.plot_relationship_path_pdetection(sim_data, "45s", True)
     # trajectory_plot_3d = plotter.plot3d(sim_data, "45s", False)
     # trajectory_plot_2d = plotter.plot2d(sim_data, "45s", False)
     
@@ -677,10 +686,10 @@ if __name__ == '__main__':
     # single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, False)
 
     # ### PLOT RCS
-    df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
-    # # fig, ax = get_spider_plot(df, "45s")
-    # # plt.show()
-    plotter.animate_rcs_plot(df_45, sim_data, "45s",0, True)
+    # df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
+    # # # fig, ax = get_spider_plot(df, "45s")
+    # # # plt.show()
+    # plotter.animate_rcs_plot(df_45, sim_data, "45s",-1, True)
     plt.show()
 
 #%% Animate the closed set stuff

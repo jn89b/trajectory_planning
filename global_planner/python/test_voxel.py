@@ -19,8 +19,7 @@ if __name__ == "__main__":
     voxel_x = [x[0] for x in rays]
     voxel_y = [x[1] for x in rays]
     voxel_z = [x[2] for x in rays]
-
-
+    
     voxel_data = go.Scatter3d(
         x=voxel_x,
         y=voxel_y,

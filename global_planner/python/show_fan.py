@@ -84,7 +84,8 @@ if __name__ == '__main__':
     paths = []
     
     sparse_astar = SparseAstar(grid, 2, True, rcs_hash, 
-                               radars, weight_list[0], max_rcs_val)
+                               radars, weight_list[0], 
+                               max_rcs_val)
 
     sparse_astar.init_nodes()
     sparse_astar.update_radar_weight(weight_list[0])

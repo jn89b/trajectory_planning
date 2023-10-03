@@ -283,7 +283,6 @@ class SparseAstar():
                             rel_psi_dg += 360
 
                         if idx_pos in radar.detection_info:
-
                             #even_psi = round_to_nearest_even(rel_psi_dg)
                             rcs_key = self.get_key(
                                 int(rel_psi_dg),
@@ -295,11 +294,8 @@ class SparseAstar():
                             )
 
                             if rcs_key in self.rcs_hash:
-                                linear_max_db = 10**(self.max_rcs/10)
-                                linear_db = 10**(self.rcs_hash[rcs_key]/10)
-                                norm_rcs = linear_db/linear_max_db
-                                # radar_cost += radar_prelim_cost * (1/self.rcs_hash[rcs_key])
-                                radar_cost = radar.compute_prob_detect(dist_radar, 
+                                radar_cost = radar.compute_prob_detect(
+                                    dist_radar, 
                                     self.rcs_hash[rcs_key])
                                 
                                 rcs_val = self.rcs_hash[rcs_key]
@@ -327,13 +323,12 @@ class SparseAstar():
                                         radar.pos.vec - new_pos.vec
                                     )
                                     if rcs_key in self.rcs_hash:
-                                        linear_max_db = 10**(self.max_rcs/10)
-                                        linear_db = 10**(self.rcs_hash[rcs_key]/10)
-                                        norm_rcs = linear_db/linear_max_db
-                                        radar_cost = radar.compute_prob_detect(dist_radar, 
-                                                                                self.rcs_hash[rcs_key])
-                                        rcs_val = self.rcs_hash[rcs_key]
 
+                                        radar_cost = radar.compute_prob_detect(
+                                            dist_radar, 
+                                            self.rcs_hash[rcs_key])
+                                        
+                                        rcs_val = self.rcs_hash[rcs_key]
                                         radar_probs.append(radar_cost)
 
                                         break
@@ -354,11 +349,9 @@ class SparseAstar():
                                         radar.pos.vec - new_pos.vec
                                     )
                                     if rcs_key in self.rcs_hash:
-                                        linear_max_db = 10**(self.max_rcs/10)
-                                        linear_db = 10**(self.rcs_hash[rcs_key]/10)
-                                        norm_rcs = linear_db/linear_max_db
-                                        radar_cost = radar.compute_prob_detect(dist_radar, 
-                                                                                self.rcs_hash[rcs_key])
+                                        radar_cost = radar.compute_prob_detect(
+                                            dist_radar, 
+                                            self.rcs_hash[rcs_key])
                                         rcs_val = self.rcs_hash[rcs_key]
                             
                                         radar_probs.append(radar_cost)

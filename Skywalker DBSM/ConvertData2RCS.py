@@ -13,7 +13,6 @@ def ConvertData2RCS(std_diameter,std_filename,tgt_filename):
     std_data = pd.read_csv(std_filename,index_col=0)
     tgt_data = pd.read_csv(tgt_filename,index_col=0)
     
-    
     ''' Determine Number of Angles '''
     std_length = np.shape(std_data)
     tgt_length = np.shape(tgt_data)
@@ -26,7 +25,6 @@ def ConvertData2RCS(std_diameter,std_filename,tgt_filename):
     std_data = std_data.to_numpy()
     tgt_data = tgt_data.to_numpy()
     
-        
     ''' Plot the Data '''
     # convert data to RCS
     # Calculate Theoretical calibration sphere RCS

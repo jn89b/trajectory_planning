@@ -52,13 +52,12 @@ interp_func = interpolate.interp2d(azimuth_list, elevation_list,
 elevations = np.arange(min_pitch, max_pitch+1, 1)
 azimuths = np.arange(0, 360+1, 1)
 
-
 rcs_vals = {}
 casadi_table = []
 for az in azimuths:
     az_row = []
+    rcs_val = interp_func(az, 0)
     for ele in elevations:
-        rcs_val = interp_func(az, ele)
         az_row.append(rcs_val[0])
         key = f"{az}_{ele}"
         rcs_vals[key] = rcs_val[0]

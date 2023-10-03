@@ -135,7 +135,6 @@ if __name__ == '__main__':
         sparse_astar.clear_sets()
         paths.append(returned_path)
         
-
     # plot for sanity check 
     fig, ax = plt.subplots()
     ax.set_xlim(grid.x_min_m-20, grid.x_max_m+20)
@@ -188,10 +187,8 @@ if __name__ == '__main__':
     sim_data.sim_results['goal_position'] = goal_position.vec
     sim_data.sim_results['grid'] = grid
     
-
     pickle_dir = 'data_analysis/' + RADAR_AIRCRAFT_HASH_FILE + '.pkl'
     sim_data.pickle_data(save_dir + '.pkl')
-
 
     ax2[0].set_title("Roll")
     ax2[1].set_title("Pitch")
@@ -245,8 +242,6 @@ if __name__ == '__main__':
             
             ax.add_artist(voxel_image)
         
-        
-    
     ax.add_artist(radar_image)
     ax.legend()
 
@@ -261,8 +256,6 @@ if __name__ == '__main__':
     fig2.savefig(save_dir+"path_rpy.svg")
     fig3.savefig(save_dir+"path_rcs.svg")
     fig4.savefig(save_dir+"path_radar.svg")
-
-
     plt.show()    
 
     voxels = []

@@ -24,12 +24,12 @@ from ConvertData2RCS import *
 
 ''' Options '''
 # Define Filenames
-folder = 'Final Data/'
+folder = ''
 
 std_filename = 's25_090823_1deg.csv'
-tgt1_filename = 's25_090823 roll right 10d Skywalker_1deg.csv'
-tgt2_filename = 's25_090823 roll left 10d Skywalker_1deg.csv'
-tgt3_filename = 's25_090823 pitch up 10d Skywalker_1deg.csv'
+# tgt1_filename = 's25_090823 roll right 10d Skywalker_1deg.csv'
+# tgt2_filename = 's25_090823 roll left 10d Skywalker_1deg.csv'
+# tgt3_filename = 's25_090823 pitch up 10d Skywalker_1deg.csv'
 
 
 
@@ -42,7 +42,7 @@ tgt3_filename = 's25_090823 pitch up 10d Skywalker_1deg.csv'
 # tgt3_filename = 'High-Res Data/skywalker_x8_cone_equipped_1deg.csv'
 
 
-# tgt1_filename = 's8_mod_wood_t_1deg.csv'
+tgt1_filename = 's8_mod_wood_t_1deg.csv'
 # tgt2_filename = 's8_mod_wood_servos_t_1deg.csv'
 
 # tgt1_filename = 'rebel_1deg.csv'
@@ -74,7 +74,7 @@ tgt3_name = 'Pitch up'
 # # tgt2_name = 'Modified with Nosecone, Wood Primaries'
 # tgt3_name = 'Modified with Nosecone, Spars, and Plastic Servos'
 
-# tgt1_name = "RCS [dBsm] at +5\xb0 pitch"
+tgt1_name = "RCS [dBsm] at +5\xb0 pitch"
 # tgt2_name = "RCS [dBsm] at 0\xb0 pitch"
 # tgt3_name = "RCS [dBsm] at -5\xb0 pitch"
 
@@ -82,9 +82,9 @@ tgt3_name = 'Pitch up'
 size = 0.25 # diameter in meters
 
 ''' Convert Data 2 RCS Data '''
-angles, tgt1_rcs_m2, tgt1_rcs_dB = ConvertData2RCS(size, folder+std_filename, folder+tgt1_filename)
-angles, tgt2_rcs_m2, tgt2_rcs_dB = ConvertData2RCS(size, folder+std_filename, folder+tgt2_filename)
-angles, tgt3_rcs_m2, tgt3_rcs_dB = ConvertData2RCS(size, folder+std_filename, folder+tgt3_filename)
+angles, tgt1_rcs_m2, tgt1_rcs_dB = ConvertData2RCS(size, std_filename, tgt1_filename)
+# angles, tgt2_rcs_m2, tgt2_rcs_dB = ConvertData2RCS(size, std_filename, tgt2_filename)
+# angles, tgt3_rcs_m2, tgt3_rcs_dB = ConvertData2RCS(size, std_filename, tgt3_filename)
 # angles, tgt4_rcs_m2, tgt4_rcs_dB = ConvertData2RCS(size, folder+std_filename, folder+tgt4_filename)
 
 

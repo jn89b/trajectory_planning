@@ -687,8 +687,8 @@ if __name__ == '__main__':
     # single_traj_2d = plotter.animate_single_trajectory(sim_data, "45s", 0, False)
 
     # ### PLOT RCS
-    # df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
-    # # # fig, ax = get_spider_plot(df, "45s")
+    df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
+    fig, ax = get_spider_plot(df_45, "45s")
     # # # plt.show()
     # plotter.animate_rcs_plot(df_45, sim_data, "45s",-1, True)
     plt.show()

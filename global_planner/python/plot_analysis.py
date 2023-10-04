@@ -672,7 +672,8 @@ if __name__ == '__main__':
 #%% Plot the trajectories and results
     plotter = PlotSim()
     # rcs_plot = plotter.plot_rcs(sim_data, "45s")
-    rcs_detection_plot = plotter.plot_relationship_path_pdetection(sim_data, "45s", True)
+    rcs_detection_plot = plotter.plot_relationship_path_pdetection(
+        sim_data, "45s", True)
     # trajectory_plot_3d = plotter.plot3d(sim_data, "45s", False)
     # trajectory_plot_2d = plotter.plot2d(sim_data, "45s", False)
     

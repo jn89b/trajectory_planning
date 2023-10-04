@@ -74,7 +74,7 @@ for i, df in enumerate(dfs_list):
             color=seaborn_palette[i])
 ax.legend()
 
-
+plt.show()
 
 
 

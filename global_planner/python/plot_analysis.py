@@ -608,7 +608,7 @@ class PlotSim():
             print("saving gif")
         plt.show()
 
-def get_spider_plot(df_rcs:pd.DataFrame, title_name:str):
+def get_spider_plot(df_rcs:pd.DataFrame, title_name:str, save:bool=False):
     # get 8th row
     rcs_vals = df_rcs.iloc[8, :]
     angles = np.arange(0, 360+1, 2)
@@ -624,11 +624,18 @@ def get_spider_plot(df_rcs:pd.DataFrame, title_name:str):
     
     full_title = title_name + " RCS"
     ax.set_title(full_title, size=11, y=1.1)
+    ax.set_rlim(-100, 10)
 
     #set north to 0 degrees
     ax.set_theta_zero_location("N")
 
-
+    if save == True:
+        print("saving to directory")
+        fig.savefig('figures/' + title_name + '_rcs.png')
+        #save as svg
+        fig.savefig('figures/' + title_name + '_rcs.svg')
+        
+    
     return fig, ax
 
 def compute_sum_rcs(sim_data:dict):
@@ -672,8 +679,8 @@ if __name__ == '__main__':
 #%% Plot the trajectories and results
     plotter = PlotSim()
     # rcs_plot = plotter.plot_rcs(sim_data, "45s")
-    rcs_detection_plot = plotter.plot_relationship_path_pdetection(
-        sim_data, "45s", True)
+    # rcs_detection_plot = plotter.plot_relationship_path_pdetection(
+    #     sim_data, "45s", True)
     # trajectory_plot_3d = plotter.plot3d(sim_data, "45s", False)
     # trajectory_plot_2d = plotter.plot2d(sim_data, "45s", False)
     
@@ -688,7 +695,7 @@ if __name__ == '__main__':
 
     # ### PLOT RCS
     df_45 = pd.read_csv('info/plane_45s_plane_sig.csv', header=None)
-    fig, ax = get_spider_plot(df_45, "45s")
+    fig, ax = get_spider_plot(df_45, "45s", True)
     # # # plt.show()
     # plotter.animate_rcs_plot(df_45, sim_data, "45s",-1, True)
     plt.show()

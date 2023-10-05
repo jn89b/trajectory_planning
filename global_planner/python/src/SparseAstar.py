@@ -122,6 +122,13 @@ class SparseAstar():
         self.start_node = Node(None, self.agent.position, 
                                self.velocity, 0,
                                self.agent.theta_dg, self.agent.psi_dg)
+        
+        radar_cost, rcs_val = self.get_radar_cost(self.start_node)
+        self.start_node.radar_cost = radar_cost
+        self.start_node.rcs_value = rcs_val
+        self.start_node.radar_detection = radar_cost
+
+
         self.start_node.g = self.start_node.h = self.start_node.f = 0
         self.open_set.put((self.start_node.f, self.start_node))
 
@@ -199,6 +206,124 @@ class SparseAstar():
             waypoints.append(points)
             
         return waypoints
+
+
+    def get_radar_cost(self, node:Node)->tuple:
+        """
+        pass
+        """
+        #compute heuristic based on radar 
+        if self.use_radar:
+            radar_cost = 0
+            rcs_val = -100
+            radar_probs = []
+            ## Need to reclass this to radar system
+            for radar in self.radars:
+                idx_pos = self.grid.convert_position_to_index(node.position)
+                #get radar value
+                #wrap psi_dg between 0 and 360
+                wrapped_psi_dg = node.psi_dg
+
+                rel_phi_dg = node.phi_dg
+                rel_theta_dg = node.theta_dg - (90 - radar.elevation_angle_dg)
+                # rel_psi_dg = wrapped_psi_dg - radar.azmith_angle_dg
+                # rel_psi_dg = radar.azmith_angle_dg - wrapped_psi_dg
+
+                dy = node.position.y - radar.pos.y
+                dx = node.position.x - radar.pos.x
+                rel_psi_dg = np.arctan2(dy, dx) * 180 / np.pi
+                rel_psi_dg = rel_psi_dg - node.psi_dg + 180
+
+                if rel_psi_dg > 360:
+                    rel_psi_dg -= 360
+                if rel_psi_dg < 0:
+                    rel_psi_dg += 360
+
+                if idx_pos in radar.detection_info:
+                    #even_psi = round_to_nearest_even(rel_psi_dg)
+                    rcs_key = self.get_key(
+                        int(rel_psi_dg),
+                        int(0)
+                    )
+                    
+                    dist_radar = np.linalg.norm(
+                        radar.pos.vec - node.position.vec
+                    )
+
+                    if rcs_key in self.rcs_hash:
+                        radar_cost = radar.compute_prob_detect(
+                            dist_radar, 
+                            self.rcs_hash[rcs_key])
+                        
+                        rcs_val = self.rcs_hash[rcs_key]
+                        radar_probs.append(radar_cost)
+
+                else:
+
+
+                    #Need to fix voxel detections this is a hacky way to fix it
+                    z_vals = [0, 1, -1, 2, -2]
+                    y_vals = [0, 1, -1, 2, -2]
+                    x_vals = [0, 1, -1, 2, -2]
+                    for z in z_vals:
+                        next_z = node.position.z + z
+                        new_pos = PositionVector(node.position.x,
+                                                    node.position.y,
+                                                    next_z)
+                        idx_pos = self.grid.convert_position_to_index(new_pos)
+                        if idx_pos in radar.detection_info:
+                            rcs_key = self.get_key(
+                                int(rel_psi_dg),
+                                int(0)
+                            )
+                            dist_radar = np.linalg.norm(
+                                radar.pos.vec - new_pos.vec
+                            )
+                            if rcs_key in self.rcs_hash:
+
+                                radar_cost = radar.compute_prob_detect(
+                                    dist_radar, 
+                                    self.rcs_hash[rcs_key])
+                                
+                                rcs_val = self.rcs_hash[rcs_key]
+                                radar_probs.append(radar_cost)
+
+                                break
+
+                    for x,y in zip(x_vals, y_vals):
+                        next_x = node.position.x + x
+                        next_y = node.position.y + y
+                        new_pos = PositionVector(next_x,
+                                                    next_y,
+                                                    node.position.z)
+                        idx_pos = self.grid.convert_position_to_index(new_pos)
+                        if idx_pos in radar.detection_info:
+                            rcs_key = self.get_key(
+                                int(rel_psi_dg),
+                                int(0)
+                            )
+                            dist_radar = np.linalg.norm(
+                                radar.pos.vec - new_pos.vec
+                            )
+                            if rcs_key in self.rcs_hash:
+                                radar_cost = radar.compute_prob_detect(
+                                    dist_radar, 
+                                    self.rcs_hash[rcs_key])
+                                rcs_val = self.rcs_hash[rcs_key]
+                    
+                                radar_probs.append(radar_cost)
+                                break
+        
+        if len(radar_probs) > 1:
+            radar_cost = (1 - np.prod(1 - np.array(radar_probs))) #*np.sqrt(len(radar_probs))
+            # continue
+        elif len(radar_probs) == 1:
+            radar_cost = radar_probs[0]
+        else:
+            radar_cost = 0
+
+        return radar_cost, rcs_val
+        
 
     def search(self):
         

@@ -156,8 +156,8 @@ if __name__ == '__main__':
         f_cost = [x[6] for x in wp_path]
         radar_detect = [x[7] for x in wp_path]
 
-        print("path length", len(path_x))
-        print("radar detect length", len(radar_detect))
+        # print("path length", len(path_x))
+        # print("radar detect length", len(radar_detect))
 
         ax.plot(path_x, path_y, '-o', label=str(weight_list[i]))
         
@@ -168,7 +168,6 @@ if __name__ == '__main__':
         ax3.plot(f_cost, '-o', label=str(weight_list[i])+'rcs_value')
         ax4.plot(radar_detect,'-o', label=str(weight_list[i])+'radar detect')
 
-    
     sim_data = SimDataContainer()
     sim_data.sim_results['paths'] = paths
     sim_data.sim_results['weights'] = weight_list
